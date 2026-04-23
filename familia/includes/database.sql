@@ -1,5 +1,5 @@
 -- ============================================================
---  FAMILIA MANAGER — SCHEMA DO BANCO DE DADOS
+--  FAMILIA MANAGER — SCHEMA DO BANCO DE DADOS ATUALIZADO
 -- ============================================================
 
 CREATE DATABASE IF NOT EXISTS familia_manager
@@ -18,14 +18,14 @@ CREATE TABLE IF NOT EXISTS familias (
 
 -- ── Usuários ──────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS usuarios (
-  id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  familia_id  INT UNSIGNED,
-  nome        VARCHAR(100) NOT NULL,
-  email       VARCHAR(150) NOT NULL UNIQUE,
-  senha       VARCHAR(255) NOT NULL,
-  papel       ENUM('admin','membro') DEFAULT 'membro',
-  avatar      VARCHAR(255),
-  pontos         INT UNSIGNED DEFAULT 0,
+  id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  familia_id   INT UNSIGNED,
+  nome         VARCHAR(100) NOT NULL,
+  email        VARCHAR(150) NOT NULL UNIQUE,
+  senha        VARCHAR(255) NOT NULL,
+  papel        ENUM('admin','membro') DEFAULT 'membro',
+  avatar       VARCHAR(255),
+  pontos       INT UNSIGNED DEFAULT 0,
   telefone       VARCHAR(20),
   data_nascimento DATE,
   bio            TEXT,
@@ -137,74 +137,46 @@ CREATE TABLE IF NOT EXISTS missoes (
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS missoes_usuarios (
-  id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  missao_id   INT UNSIGNED NOT NULL,
-  usuario_id  INT UNSIGNED NOT NULL,
-  concluida   TINYINT(1) DEFAULT 0,
+  id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  missao_id    INT UNSIGNED NOT NULL,
+  usuario_id   INT UNSIGNED NOT NULL,
+  concluida    TINYINT(1) DEFAULT 0,
   concluida_em DATETIME,
   UNIQUE KEY uq_missao_usuario (missao_id, usuario_id),
   FOREIGN KEY (missao_id) REFERENCES missoes(id) ON DELETE CASCADE,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- ── Dados de exemplo ─────────────────────────────────────────
-INSERT IGNORE INTO familias (nome, codigo, descricao) VALUES
-  ('Família Silva', 'SILVA2024', 'Nossa família unida!');
+-- ── Dados de exemplo (Alinhados com o Site) ─────────────────────────────────────────
 
-INSERT IGNORE INTO usuarios (familia_id, nome, email, senha, papel, pontos) VALUES
-  (1, 'João Silva',   'joao@familia.com',   '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin',  320),
-  (1, 'Maria Silva',  'maria@familia.com',  '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'membro', 280),
-  (1, 'Pedro Silva',  'pedro@familia.com',  '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'membro', 195),
-  (1, 'Ana Silva',    'ana@familia.com',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'membro', 150);
--- Senha padrão: password
+-- Ajustado para bater com "Família Parrilla" do JavaScript
+INSERT IGNORE INTO familias (id, nome, codigo, descricao) VALUES
+  (1, 'Família Parrilla', 'PARR2026', 'Nossa família unida e organizada!');
+
+-- Ajustado e-mails para o padrão e incluída a senha do Demo (123456) 
+-- Nota: Em produção, use password_hash do PHP.
+INSERT IGNORE INTO usuarios (id, familia_id, nome, email, senha, papel, pontos) VALUES
+  (1, 1, 'Rafaela Parrilla',  'rafaela.parrilla@email.com', '123456', 'admin',  320),
+  (2, 2, 'Andressa Parrilla', 'andressa.parrilla@email.com', '123456', 'membro', 280),
+  (3, 3, 'Isabelli Parrilla', 'isabelli.parrilla@email.com', '123456', 'membro', 195),
+  (4, 4, 'Gustavo Parrilla',  'gustavo.parrilla@email.com',  '123456', 'membro', 150),
+  (5, 5, 'Rafael Parrilla',   'rafael.parrilla@email.com',   '123456', 'membro', 150);
 
 INSERT IGNORE INTO eventos (familia_id, criador_id, titulo, descricao, data_inicio, data_fim, local, cor, tipo) VALUES
-  (1, 1, 'Aniversário da Maria',   'Festa de 40 anos!',          '2026-05-15 18:00:00', '2026-05-15 23:00:00', 'Casa',         '#FF6584', 'aniversario'),
-  (1, 1, 'Reunião Familiar',       'Planejamento do mês',        '2026-04-20 19:00:00', '2026-04-20 21:00:00', 'Sala de estar','#6C63FF', 'reuniao'),
-  (1, 2, 'Consulta médica Pedro',  'Pediatra Dr. Carlos',        '2026-04-22 10:00:00', NULL,                  'Clínica São Lucas','#43C6AC','compromisso'),
-  (1, 1, 'Churrasco de domingo',   'Família toda reunida',       '2026-04-26 12:00:00', '2026-04-26 18:00:00', 'Quintal',      '#FFB347', 'evento');
+  (1, 1, 'Aniversário da Merlotto', 'Festa de 17 anos!', '2026-05-07 18:00:00', '2026-05-07 23:00:00', 'Casa', '#FF6584', 'aniversario'),
+  (1, 1, 'Reunião Familiar', 'Planejamento do mês', '2026-04-20 19:00:00', '2026-04-20 21:00:00', 'Sala de estar','#6C63FF', 'reuniao');
 
-INSERT IGNORE INTO listas_compras (familia_id, nome, criado_por) VALUES
-  (1, 'Compras da semana', 1),
-  (1, 'Festa da Maria',    2);
+INSERT IGNORE INTO listas_compras (id, familia_id, nome, criado_por) VALUES
+  (1, 1, 'Compras da semana', 1),
+  (2, 1, 'Festa de Aniversário', 2);
 
 INSERT IGNORE INTO itens_compra (lista_id, nome, quantidade, unidade, categoria, preco) VALUES
-  (1, 'Arroz',        2,  'kg',  'Grãos',      5.99),
-  (1, 'Feijão',       1,  'kg',  'Grãos',      7.50),
-  (1, 'Leite',        6,  'L',   'Laticínios', 4.20),
-  (1, 'Pão de forma', 1,  'un',  'Padaria',    6.90),
-  (1, 'Frango',       2,  'kg',  'Carnes',     14.99),
-  (2, 'Refrigerante', 4,  'L',   'Bebidas',    8.50),
-  (2, 'Bolo',         1,  'un',  'Confeitaria',65.00),
-  (2, 'Salgadinhos',  200,'g',   'Snacks',     12.00);
+  (1, 'Arroz', 2, 'kg', 'Grãos', 5.99),
+  (1, 'Feijão', 1, 'kg', 'Grãos', 7.50),
+  (1, 'Leite', 6, 'L', 'Laticínios', 4.20),
+  (2, 'Refrigerante', 4, 'L', 'Bebidas', 8.50),
+  (2, 'Bolo de Festa', 1, 'un', 'Confeitaria', 65.00);
 
 INSERT IGNORE INTO transacoes (familia_id, usuario_id, tipo, descricao, valor, categoria, data) VALUES
-  (1, 1, 'receita',  'Salário João',          5500.00, 'Salário',     '2026-04-05'),
-  (1, 2, 'receita',  'Salário Maria',         4200.00, 'Salário',     '2026-04-05'),
-  (1, 1, 'despesa',  'Aluguel',               1800.00, 'Moradia',     '2026-04-10'),
-  (1, 1, 'despesa',  'Supermercado',           650.00, 'Alimentação', '2026-04-12'),
-  (1, 2, 'despesa',  'Escola das crianças',    900.00, 'Educação',    '2026-04-08'),
-  (1, 1, 'despesa',  'Conta de luz',           180.00, 'Contas',      '2026-04-15'),
-  (1, 1, 'despesa',  'Internet',               120.00, 'Contas',      '2026-04-15'),
-  (1, 2, 'despesa',  'Academia',               150.00, 'Saúde',       '2026-04-03'),
-  (1, 1, 'receita',  'Freelance',              800.00, 'Extra',       '2026-04-18'),
-  (1, 2, 'despesa',  'Farmácia',                85.00, 'Saúde',       '2026-04-16');
-
-INSERT IGNORE INTO metas_financeiras (familia_id, titulo, valor_meta, valor_atual, prazo, icone) VALUES
-  (1, 'Viagem de férias',    8000.00, 3200.00, '2026-12-01', '✈️'),
-  (1, 'Reforma da cozinha',  5000.00, 1500.00, '2026-08-01', '🔨'),
-  (1, 'Fundo de emergência', 10000.00,6500.00, NULL,         '🛡️');
-
-INSERT IGNORE INTO missoes (familia_id, titulo, descricao, pontos, icone, dificuldade, prazo) VALUES
-  (1, 'Organizar a garagem',    'Limpar e organizar todos os itens da garagem',  30, '🏠', 'medio',   '2026-04-30'),
-  (1, 'Semana sem delivery',    'Cozinhar em casa todos os dias por uma semana', 50, '🍳', 'dificil', '2026-04-27'),
-  (1, 'Leitura em família',     'Ler um livro juntos por 30 min por dia',        20, '📚', 'facil',   '2026-04-25'),
-  (1, 'Plantar uma horta',      'Criar uma pequena horta no quintal',            40, '🌱', 'medio',   '2026-05-15'),
-  (1, 'Passeio no parque',      'Fazer um piquenique no parque',                 15, '🌳', 'facil',   '2026-04-26');
-
-INSERT IGNORE INTO notificacoes (usuario_id, familia_id, titulo, mensagem, tipo, icone) VALUES
-  (1, 1, 'Aniversário se aproxima!',  'O aniversário da Maria é em 28 dias.',    'aviso',  '🎂'),
-  (1, 1, 'Meta atingida!',            'Vocês pouparam R$ 3.200 para a viagem!',  'sucesso','🎉'),
-  (1, 1, 'Nova missão disponível',    'Semana sem delivery foi adicionada.',     'info',   '⭐'),
-  (2, 1, 'Lista de compras atualizada','João adicionou itens à lista.',          'info',   '🛒'),
-  (3, 1, 'Parabéns!',                 'Você completou a missão Leitura!',        'sucesso','🏆');
+  (1, 1, 'receita', 'Salário Rafaela', 5500.00, 'Salário', '2026-04-05'),
+  (1, 1, 'despesa', 'Aluguel', 1800.0
