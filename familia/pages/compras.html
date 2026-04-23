@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FamíliaApp — Compras</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    .list-tab {
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-size: .88rem;
+      font-weight: 600;
+      border: 1.5px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .list-tab.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .item-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .item-row:last-child { border-bottom: none; }
+    .item-row.bought .item-name {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+    .item-check {
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all var(--transition);
+    }
+    .item-check.checked {
+      background: var(--success);
+      border-color: var(--success);
+      color: #fff;
+    }
+    .item-name { flex: 1; font-size: .9rem; font-weight: 500; }
+    .item-qty  { font-size: .82rem; color: var(--text-muted); min-width: 60px; }
+    .item-price { font-size: .85rem; font-weight: 600; color: var(--text); min-width: 70px; text-align: right; }
+    .cat-chip {
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: .72rem;
+      font-weight: 600;
+      background: var(--bg);
+      color: var(--text-muted);
+    }
+    .summary-bar {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .summary-bar .s-item { text-align: center; }
+    .summary-bar .s-val  { font-size: 1.4rem; font-weight: 800; }
+    .summary-bar .s-lbl  { font-size: .78rem; opacity: .85; }
+    .summary-bar .s-div  { width: 1px; height: 40px; background: rgba(255,255,255,.3); }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🏡</div>
+    <div class="logo-text">Family<span>Hub</span></div>
+  </div>
+  <div class="sidebar-family">
+    <div class="family-label">Família</div>
+    <div class="family-name" id="sb-family-name">Família Parrilla</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="agenda.html"    class="nav-item"><span class="nav-icon">📅</span> Agenda</a>
+    <a href="compras.html"   class="nav-item active"><span class="nav-icon">🛒</span> Compras</a>
+    <a href="financas.html"  class="nav-item"><span class="nav-icon">💰</span> Finanças</a>
+    <a href="missoes.html"   class="nav-item"><span class="nav-icon">⭐</span> Missões</a>
+    <div class="nav-section-label">Comunidade</div>
+    <a href="ranking.html"      class="nav-item"><span class="nav-icon">🏆</span> Ranking</a>
+    <a href="notificacoes.html" class="nav-item"><span class="nav-icon">🔔</span> Notificações <span class="nav-badge">3</span></a>
+    <div class="nav-section-label">Conta</div>
+    <a href="perfil.html" class="nav-item"><span class="nav-icon">👤</span> Meu Perfil</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sb-avatar">RP</div>
+      <div class="user-info">
+        <div class="user-name" id="sb-user-name">Rafaela Parrilla</div>
+        <div class="user-role">Administrador</div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()" title="Sair">🚪</button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-wrapper">
+  <header class="topbar">
+    <div class="topbar-title">Lista de Compras</div>
+    <div class="topbar-search">
+    </div>
+    <div class="topbar-actions">
+      <a href="notificacoes.html" class="topbar-btn">🔔 <span class="badge">3</span></a>
+      <a href="perfil.html" class="topbar-avatar" id="topbar-avatar">RP</a>
+    </div>
+  </header>
+
+  <main class="page-content">
+
+    <div class="page-header">
+      <div>
+        <h1>🛒 Compras</h1>
+        <p>Listas de compras colaborativas para a família</p>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-outline" onclick="openModal('modal-nova-lista')">📋 Nova lista</button>
+        <button class="btn btn-primary" onclick="openModal('modal-add-item')">➕ Adicionar item</button>
+      </div>
+    </div>
+
+    <!-- Summary bar -->
+    <div class="summary-bar" id="summary-bar">
+      <div class="s-item">
+        <div class="s-val" id="sum-total">8</div>
+        <div class="s-lbl">Total de itens</div>
+      </div>
+      <div class="s-div"></div>
+      <div class="s-item">
+        <div class="s-val" id="sum-bought">2</div>
+        <div class="s-lbl">Comprados</div>
+      </div>
+      <div class="s-div"></div>
+      <div class="s-item">
+        <div class="s-val" id="sum-pending">6</div>
+        <div class="s-lbl">Pendentes</div>
+      </div>
+      <div class="s-div"></div>
+      <div class="s-item">
+        <div class="s-val" id="sum-value">R$ 124,08</div>
+        <div class="s-lbl">Valor estimado</div>
+      </div>
+      <div style="flex:1"></div>
+      <div>
+        <div class="progress" style="width:160px;background:rgba(255,255,255,.3)">
+          <div class="progress-bar" id="sum-progress" style="background:#fff;width:25%"></div>
+        </div>
+        <div style="font-size:.75rem;margin-top:4px;opacity:.85" id="sum-pct">25% concluído</div>
+      </div>
+    </div>
+
+    <!-- Listas tabs -->
+    <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap" id="lists-tabs">
+      <!-- Gerado via JS -->
+    </div>
+
+    <!-- Filtro por categoria -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap" id="cat-filters">
+      <button class="filter-btn active" onclick="setCatFilter('todas', this)">Todas</button>
+    </div>
+
+    <!-- Itens da lista -->
+    <div class="grid-2-1">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title" id="active-list-name">Compras da semana</div>
+            <div class="card-subtitle" id="active-list-sub">6 itens pendentes</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-success btn-sm" onclick="markAllBought()">✅ Marcar todos</button>
+            <button class="btn btn-danger btn-sm" onclick="clearBought()">🗑️ Limpar comprados</button>
+          </div>
+        </div>
+        <div id="items-container"></div>
+      </div>
+
+      <!-- Painel lateral -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- Resumo por categoria -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📊 Por Categoria</div>
+          </div>
+          <div id="cat-summary"></div>
+        </div>
+
+
+        <!-- Histórico de listas -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📋 Minhas Listas</div>
+            <button class="btn btn-secondary btn-sm" onclick="openModal('modal-nova-lista')">+ Nova</button>
+          </div>
+          <div id="lists-sidebar"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Modal nova lista -->
+<div class="modal-overlay" id="modal-nova-lista">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📋 Nova Lista de Compras</div>
+      <button class="modal-close" onclick="closeModal('modal-nova-lista')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nome da lista *</label>
+      <input type="text" class="form-control" id="nova-lista-nome" placeholder="Ex: Festa de aniversário">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-nova-lista')">Cancelar</button>
+      <button class="btn btn-primary" onclick="createList()">Criar lista</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal adicionar item -->
+<div class="modal-overlay" id="modal-add-item">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">➕ Adicionar Item</div>
+      <button class="modal-close" onclick="closeModal('modal-add-item')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nome do item *</label>
+      <input type="text" class="form-control" id="item-nome" placeholder="Ex: Arroz">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Quantidade</label>
+        <input type="number" class="form-control" id="item-qty" value="1" min="0.1" step="0.1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Unidade</label>
+        <select class="form-control" id="item-unidade">
+          <option>un</option><option>kg</option><option>g</option>
+          <option>L</option><option>ml</option><option>cx</option><option>pct</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Categoria</label>
+        <select class="form-control" id="item-cat">
+          <option>Grãos</option><option>Laticínios</option><option>Carnes</option>
+          <option>Padaria</option><option>Bebidas</option><option>Snacks</option>
+          <option>Confeitaria</option><option>Higiene</option><option>Limpeza</option><option>Outros</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Preço estimado (R$)</label>
+        <input type="number" class="form-control" id="item-preco" placeholder="0,00" step="0.01" min="0">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-add-item')">Cancelar</button>
+      <button class="btn btn-primary" onclick="addItem()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/layout.js"></script>
+<script>
+// ── Dados ──────────────────────────────────────────────────
+let lists = [
+  { id:1, nome:'Compras da semana', ativa:true  },
+  { id:2, nome:'Festa da Merlotto',    ativa:false },
+];
+
+let items = [
+  { id:1, lista:1, nome:'Arroz',        qty:2,   un:'kg',  cat:'Grãos',      preco:5.99,  bought:false },
+  { id:2, lista:1, nome:'Feijão',       qty:1,   un:'kg',  cat:'Grãos',      preco:7.50,  bought:false },
+  { id:3, lista:1, nome:'Leite',        qty:6,   un:'L',   cat:'Laticínios', preco:4.20,  bought:true  },
+  { id:4, lista:1, nome:'Pão de forma', qty:1,   un:'un',  cat:'Padaria',    preco:6.90,  bought:true  },
+  { id:5, lista:1, nome:'Frango',       qty:2,   un:'kg',  cat:'Carnes',     preco:14.99, bought:false },
+  { id:6, lista:2, nome:'Refrigerante', qty:4,   un:'L',   cat:'Bebidas',    preco:8.50,  bought:false },
+  { id:7, lista:2, nome:'Bolo',         qty:1,   un:'un',  cat:'Confeitaria',preco:65.00, bought:false },
+  { id:8, lista:2, nome:'Salgadinhos',  qty:200, un:'g',   cat:'Snacks',     preco:12.00, bought:false },
+];
+
+let activeListId = 1;
+let catFilter    = 'todas';
+let nextItemId   = 9;
+let nextListId   = 3;
+
+const CAT_COLORS = {
+  'Grãos':'#6C63FF','Laticínios':'#43C6AC','Carnes':'#FF5C5C','Padaria':'#FFB347',
+  'Bebidas':'#9B59B6','Snacks':'#FF6584','Confeitaria':'#FF6584','Higiene':'#43C6AC',
+  'Limpeza':'#6C63FF','Outros':'#8A94A6'
+};
+
+// ── Render ─────────────────────────────────────────────────
+function render() {
+  renderTabs();
+  renderCatFilters();
+  renderItems();
+  renderCatSummary();
+  renderSummary();
+  renderSidebar();
+}
+
+function renderTabs() {
+  document.getElementById('lists-tabs').innerHTML = lists.map(l =>
+    `<button class="list-tab${l.id===activeListId?' active':''}" onclick="switchList(${l.id})">
+       🛒 ${l.nome}
+     </button>`
+  ).join('');
+}
+
+function renderCatFilters() {
+  const activeItems = items.filter(i => i.lista === activeListId);
+  const cats = ['todas', ...new Set(activeItems.map(i => i.cat))];
+  document.getElementById('cat-filters').innerHTML = cats.map(c =>
+    `<button class="filter-btn${c===catFilter?' active':''}" onclick="setCatFilter('${c}', this)">${c==='todas'?'Todas':c}</button>`
+  ).join('');
+}
+
+function renderItems() {
+  const list = lists.find(l => l.id === activeListId);
+  document.getElementById('active-list-name').textContent = list ? list.nome : '';
+
+  let filtered = items.filter(i => i.lista === activeListId);
+  if (catFilter !== 'todas') filtered = filtered.filter(i => i.cat === catFilter);
+
+  const pending = filtered.filter(i => !i.bought).length;
+  document.getElementById('active-list-sub').textContent = `${pending} item(ns) pendente(s)`;
+
+  if (!filtered.length) {
+    document.getElementById('items-container').innerHTML =
+      '<div class="empty-state"><div class="empty-icon">🛒</div><p>Nenhum item nesta lista.</p></div>';
+    return;
+  }
+
+  // Separar pendentes e comprados
+  const pending_items = filtered.filter(i => !i.bought);
+  const bought_items  = filtered.filter(i =>  i.bought);
+
+  let html = '';
+  if (pending_items.length) {
+    html += `<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);padding:8px 0 4px">Pendentes (${pending_items.length})</div>`;
+    html += pending_items.map(i => itemRow(i)).join('');
+  }
+  if (bought_items.length) {
+    html += `<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;color:var(--success);padding:16px 0 4px">Comprados (${bought_items.length})</div>`;
+    html += bought_items.map(i => itemRow(i)).join('');
+  }
+
+  document.getElementById('items-container').innerHTML = html;
+}
+
+function itemRow(i) {
+  const color = CAT_COLORS[i.cat] || '#8A94A6';
+  return `<div class="item-row${i.bought?' bought':''}" id="item-row-${i.id}">
+    <div class="item-check${i.bought?' checked':''}" onclick="toggleItem(${i.id})">${i.bought?'✓':''}</div>
+    <div class="item-name">${i.nome}</div>
+    <div class="item-qty">${i.qty} ${i.un}</div>
+    <span class="cat-chip" style="background:${color}22;color:${color}">${i.cat}</span>
+    <div class="item-price">${i.preco ? 'R$ '+i.preco.toFixed(2).replace('.',',') : '—'}</div>
+    <button class="btn btn-danger btn-sm btn-icon" onclick="removeItem(${i.id})" title="Remover">✕</button>
+  </div>`;
+}
+
+function renderCatSummary() {
+  const activeItems = items.filter(i => i.lista === activeListId);
+  const cats = {};
+  activeItems.forEach(i => {
+    if (!cats[i.cat]) cats[i.cat] = { total:0, bought:0 };
+    cats[i.cat].total++;
+    if (i.bought) cats[i.cat].bought++;
+  });
+
+  document.getElementById('cat-summary').innerHTML = Object.entries(cats).map(([cat, data]) => {
+    const pct = Math.round((data.bought / data.total) * 100);
+    const color = CAT_COLORS[cat] || '#8A94A6';
+    return `<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:.82rem;font-weight:600">${cat}</span>
+        <span style="font-size:.75rem;color:var(--text-muted)">${data.bought}/${data.total}</span>
+      </div>
+      <div class="progress"><div class="progress-bar" style="background:${color};width:${pct}%"></div></div>
+    </div>`;
+  }).join('') || '<div class="text-muted" style="font-size:.85rem">Nenhum item.</div>';
+}
+
+function renderSummary() {
+  const activeItems = items.filter(i => i.lista === activeListId);
+  const total  = activeItems.length;
+  const bought = activeItems.filter(i => i.bought).length;
+  const pending= total - bought;
+  const value  = activeItems.reduce((s, i) => s + (i.preco || 0) * i.qty, 0);
+  const pct    = total ? Math.round((bought/total)*100) : 0;
+
+  document.getElementById('sum-total').textContent   = total;
+  document.getElementById('sum-bought').textContent  = bought;
+  document.getElementById('sum-pending').textContent = pending;
+  document.getElementById('sum-value').textContent   = 'R$ ' + value.toFixed(2).replace('.',',');
+  document.getElementById('sum-progress').style.width= pct + '%';
+  document.getElementById('sum-pct').textContent     = pct + '% concluído';
+}
+
+function renderSidebar() {
+  document.getElementById('lists-sidebar').innerHTML = lists.map(l => {
+    const count = items.filter(i => i.lista === l.id).length;
+    const done  = items.filter(i => i.lista === l.id && i.bought).length;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="switchList(${l.id})">
+      <div style="font-size:1.2rem">🛒</div>
+      <div style="flex:1">
+        <div style="font-size:.88rem;font-weight:600${l.id===activeListId?';color:var(--primary)':''}">${l.nome}</div>
+        <div style="font-size:.75rem;color:var(--text-muted)">${done}/${count} itens</div>
+      </div>
+      <button class="btn btn-danger btn-sm btn-icon" onclick="event.stopPropagation();removeList(${l.id})" title="Excluir lista">✕</button>
+    </div>`;
+  }).join('') || '<div class="text-muted" style="font-size:.85rem">Nenhuma lista.</div>';
+}
+
+// ── Ações ──────────────────────────────────────────────────
+function toggleItem(id) {
+  const item = items.find(i => i.id === id);
+  if (item) {
+    item.bought = !item.bought;
+    if (item.bought) showToast(`"${item.nome}" marcado como comprado! ✅`, 'success');
+    render();
+  }
+}
+
+function removeItem(id) {
+  const item = items.find(i => i.id === id);
+  items = items.filter(i => i.id !== id);
+  showToast(`"${item?.nome}" removido.`, 'danger');
+  render();
+}
+
+function addItem() {
+  const nome = document.getElementById('item-nome').value.trim();
+  if (!nome) { showToast('Informe o nome do item.', 'warning'); return; }
+  items.push({
+    id: nextItemId++,
+    lista: activeListId,
+    nome,
+    qty:   parseFloat(document.getElementById('item-qty').value) || 1,
+    un:    document.getElementById('item-unidade').value,
+    cat:   document.getElementById('item-cat').value,
+    preco: parseFloat(document.getElementById('item-preco').value) || 0,
+    bought: false
+  });
+  closeModal('modal-add-item');
+  document.getElementById('item-nome').value = '';
+  document.getElementById('item-preco').value = '';
+  showToast('Item adicionado!', 'success');
+  render();
+}
+
+function quickAdd() {
+  const nome = document.getElementById('quick-item').value.trim();
+  if (!nome) return;
+  items.push({ id: nextItemId++, lista: activeListId, nome, qty:1, un:'un', cat:'Outros', preco:0, bought:false });
+  document.getElementById('quick-item').value = '';
+  showToast(`"${nome}" adicionado!`, 'success');
+  render();
+}
+
+function markAllBought() {
+  items.filter(i => i.lista === activeListId).forEach(i => i.bought = true);
+  showToast('Todos os itens marcados como comprados!', 'success');
+  render();
+}
+
+function clearBought() {
+  const before = items.length;
+  items = items.filter(i => !(i.lista === activeListId && i.bought));
+  const removed = before - items.length;
+  showToast(`${removed} item(ns) removido(s).`, 'info');
+  render();
+}
+
+function createList() {
+  const nome = document.getElementById('nova-lista-nome').value.trim();
+  if (!nome) { showToast('Informe o nome da lista.', 'warning'); return; }
+  lists.push({ id: nextListId++, nome, ativa: false });
+  document.getElementById('nova-lista-nome').value = '';
+  closeModal('modal-nova-lista');
+  showToast('Lista criada!', 'success');
+  render();
+}
+
+function removeList(id) {
+  if (!confirm('Excluir esta lista e todos os seus itens?')) return;
+  lists = lists.filter(l => l.id !== id);
+  items = items.filter(i => i.lista !== id);
+  if (activeListId === id) activeListId = lists[0]?.id || null;
+  showToast('Lista excluída.', 'danger');
+  render();
+}
+
+function switchList(id) {
+  activeListId = id;
+  catFilter = 'todas';
+  render();
+}
+
+function setCatFilter(cat, btn) {
+  catFilter = cat;
+  document.querySelectorAll('#cat-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderItems();
+}
+
+function searchItems(q) {
+  const term = q.toLowerCase();
+  document.querySelectorAll('.item-row').forEach(row => {
+    const name = row.querySelector('.item-name')?.textContent.toLowerCase() || '';
+    row.style.display = name.includes(term) ? '' : 'none';
+  });
+}
+
+document.addEventListener('DOMContentLoaded', render);
+</script>
+</body>
+</html>

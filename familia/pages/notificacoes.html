@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FamíliaApp — Notificações</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    .notif-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 0 22px;
+      box-shadow: var(--shadow-sm);
+    }
+    .notif-full-item {
+      display: flex;
+      gap: 16px;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
+      cursor: pointer;
+    }
+    .notif-full-item:last-child { border-bottom: none; }
+    .notif-full-item.unread {
+      background: var(--primary-light);
+      margin: 0 -22px;
+      padding: 18px 22px;
+    }
+    .notif-full-item:hover { background: var(--bg); }
+    .notif-full-item.unread:hover { background: #dde0ff; }
+    .notif-icon-circle {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .notif-content { flex: 1; }
+    .notif-title-full { font-size: .92rem; font-weight: 700; }
+    .notif-msg-full   { font-size: .83rem; color: var(--text-muted); margin-top: 3px; line-height: 1.5; }
+    .notif-time-full  { font-size: .75rem; color: var(--text-muted); margin-top: 6px; }
+    .notif-actions    { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .unread-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: var(--primary);
+      flex-shrink: 0;
+      margin-top: 6px;
+    }
+    .notif-type-tab {
+      padding: 7px 16px;
+      border-radius: 99px;
+      font-size: .82rem;
+      font-weight: 600;
+      border: 1.5px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .notif-type-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .settings-row:last-child { border-bottom: none; }
+    .toggle-switch {
+      position: relative;
+      width: 44px; height: 24px;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 99px;
+      cursor: pointer;
+      transition: .3s;
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      left: 3px; top: 3px;
+      transition: .3s;
+      box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    }
+    .toggle-switch input:checked + .toggle-slider { background: var(--primary); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🏡</div>
+    <div class="logo-text">Família<span>App</span></div>
+  </div>
+  <div class="sidebar-family">
+    <div class="family-label">Família</div>
+    <div class="family-name" id="sb-family-name">Família Parrilla</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="agenda.html"    class="nav-item"><span class="nav-icon">📅</span> Agenda</a>
+    <a href="compras.html"   class="nav-item"><span class="nav-icon">🛒</span> Compras</a>
+    <a href="financas.html"  class="nav-item"><span class="nav-icon">💰</span> Finanças</a>
+    <a href="missoes.html"   class="nav-item"><span class="nav-icon">⭐</span> Missões</a>
+    <div class="nav-section-label">Comunidade</div>
+    <a href="ranking.html"      class="nav-item"><span class="nav-icon">🏆</span> Ranking</a>
+    <a href="notificacoes.html" class="nav-item active"><span class="nav-icon">🔔</span> Notificações</a>
+    <div class="nav-section-label">Conta</div>
+    <a href="perfil.html" class="nav-item"><span class="nav-icon">👤</span> Meu Perfil</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sb-avatar">JS</div>
+      <div class="user-info">
+        <div class="user-name" id="sb-user-name">João Silva</div>
+        <div class="user-role">Administrador</div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()" title="Sair">🚪</button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-wrapper">
+  <header class="topbar">
+    <div class="topbar-title">Notificações</div>
+    <div class="topbar-actions">
+      <a href="perfil.html" class="topbar-avatar" id="topbar-avatar">RP</a>
+    </div>
+  </header>
+
+  <main class="page-content">
+
+    <div class="page-header">
+      <div>
+        <h1>🔔 Notificações</h1>
+        <p>Fique por dentro de tudo que acontece na família</p>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-outline" onclick="markAllRead()">✅ Marcar todas como lidas</button>
+        <button class="btn btn-danger" onclick="clearAll()">🗑️ Limpar todas</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid mb-24">
+      <div class="stat-card">
+        <div class="stat-icon purple">🔔</div>
+        <div class="stat-info">
+          <div class="stat-value" id="stat-total">5</div>
+          <div class="stat-label">Total de notificações</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon pink">🔴</div>
+        <div class="stat-info">
+          <div class="stat-value" id="stat-unread">3</div>
+          <div class="stat-label">Não lidas</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div class="stat-info">
+          <div class="stat-value" id="stat-read">2</div>
+          <div class="stat-label">Já lidas</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange">⚠️</div>
+        <div class="stat-info">
+          <div class="stat-value" id="stat-warn">1</div>
+          <div class="stat-label">Avisos importantes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2-1">
+
+      <!-- Lista de notificações -->
+      <div>
+        <!-- Filtros -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <button class="notif-type-tab active" onclick="filterNotifs('todas', this)">Todas</button>
+          <button class="notif-type-tab" onclick="filterNotifs('nao-lidas', this)">🔴 Não lidas</button>
+          <button class="notif-type-tab" onclick="filterNotifs('info', this)">💬 Informações</button>
+          <button class="notif-type-tab" onclick="filterNotifs('sucesso', this)">✅ Sucessos</button>
+          <button class="notif-type-tab" onclick="filterNotifs('aviso', this)">⚠️ Avisos</button>
+        </div>
+
+        <div class="notif-card" id="notif-list">
+          <!-- Gerado via JS -->
+        </div>
+      </div>
+
+      <!-- Painel lateral -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- Configurações de notificação -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⚙️ Configurações</div>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div style="font-size:.88rem;font-weight:600">Eventos da agenda</div>
+              <div style="font-size:.78rem;color:var(--text-muted)">Lembretes de compromissos</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div style="font-size:.88rem;font-weight:600">Lista de compras</div>
+              <div style="font-size:.78rem;color:var(--text-muted)">Itens adicionados/comprados</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div style="font-size:.88rem;font-weight:600">Missões concluídas</div>
+              <div style="font-size:.78rem;color:var(--text-muted)">Pontos ganhos no ranking</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div style="font-size:.88rem;font-weight:600">Alertas financeiros</div>
+              <div style="font-size:.78rem;color:var(--text-muted)">Metas e gastos</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div style="font-size:.88rem;font-weight:600">Aniversários</div>
+              <div style="font-size:.78rem;color:var(--text-muted)">Lembretes com 7 dias de antecedência</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/layout.js"></script>
+<script>
+let notifications = [
+  { id:1, titulo:'Aniversário se aproxima!',   msg:'O aniversário da Rafaela é em 11 dias. Comece a planejar!', tipo:'aviso',  icone:'🎂', lida:false, tempo:'2h atrás'   },
+  { id:2, titulo:'Meta atingida!',              msg:'Vocês pouparam R$ 3.200 para a viagem de férias! 🎉',    tipo:'sucesso',icone:'🎉', lida:false, tempo:'5h atrás'   },
+  { id:3, titulo:'Nova missão disponível',      msg:'"Semana sem delivery" foi adicionada às missões.',       tipo:'info',   icone:'⭐', lida:false, tempo:'1d atrás'   },
+  { id:4, titulo:'Lista de compras atualizada', msg:'Isabelli adicionou 3 itens à lista "Compras da semana".',    tipo:'info',   icone:'🛒', lida:true,  tempo:'1d atrás'   },
+  { id:5, titulo:'Parabéns!',                   msg:'Você completou a missão "Leitura em família"! +20 pts', tipo:'sucesso',icone:'🏆', lida:true,  tempo:'2d atrás'   },
+];
+
+let notifFilter = 'todas';
+let nextNotifId = 6;
+
+const TYPE_STYLES = {
+  info:    { bg:'#EEF0FF', color:'var(--primary)',   label:'Info'    },
+  sucesso: { bg:'#EDFAF4', color:'var(--success)',   label:'Sucesso' },
+  aviso:   { bg:'#FFF6EC', color:'var(--warning)',   label:'Aviso'   },
+  erro:    { bg:'#FFF0F0', color:'var(--danger)',    label:'Erro'    },
+};
+
+function renderNotifs() {
+  let filtered = notifications;
+  if (notifFilter === 'nao-lidas') filtered = notifications.filter(n => !n.lida);
+  else if (notifFilter !== 'todas') filtered = notifications.filter(n => n.tipo === notifFilter);
+
+  updateStats();
+
+  if (!filtered.length) {
+    document.getElementById('notif-list').innerHTML =
+      '<div class="empty-state"><div class="empty-icon">🔔</div><p>Nenhuma notificação.</p></div>';
+    return;
+  }
+
+  document.getElementById('notif-list').innerHTML = filtered.map(n => {
+    const style = TYPE_STYLES[n.tipo] || TYPE_STYLES.info;
+    return `<div class="notif-full-item${!n.lida?' unread':''}" onclick="markRead(${n.id})">
+      <div class="notif-icon-circle" style="background:${style.bg};color:${style.color}">${n.icone}</div>
+      <div class="notif-content">
+        <div class="notif-title-full">${n.titulo}</div>
+        <div class="notif-msg-full">${n.msg}</div>
+        <div class="notif-time-full">
+          <span class="badge" style="background:${style.bg};color:${style.color}">${style.label}</span>
+          &nbsp;${n.tempo}
+        </div>
+      </div>
+      <div class="notif-actions">
+        ${!n.lida ? '<div class="unread-dot"></div>' : ''}
+        <button class="btn btn-danger btn-sm btn-icon" onclick="event.stopPropagation();deleteNotif(${n.id})" title="Excluir">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateStats() {
+  const total  = notifications.length;
+  const unread = notifications.filter(n => !n.lida).length;
+  const read   = total - unread;
+  const warn   = notifications.filter(n => n.tipo === 'aviso').length;
+  document.getElementById('stat-total').textContent  = total;
+  document.getElementById('stat-unread').textContent = unread;
+  document.getElementById('stat-read').textContent   = read;
+  document.getElementById('stat-warn').textContent   = warn;
+}
+
+function markRead(id) {
+  const n = notifications.find(n => n.id === id);
+  if (n && !n.lida) { n.lida = true; renderNotifs(); }
+}
+
+function markAllRead() {
+  notifications.forEach(n => n.lida = true);
+  showToast('Todas as notificações marcadas como lidas.', 'success');
+  renderNotifs();
+}
+
+function deleteNotif(id) {
+  notifications = notifications.filter(n => n.id !== id);
+  renderNotifs();
+  showToast('Notificação removida.', 'info');
+}
+
+function clearAll() {
+  if (!confirm('Limpar todas as notificações?')) return;
+  notifications = [];
+  renderNotifs();
+  showToast('Notificações limpas.', 'info');
+}
+
+function filterNotifs(filter, btn) {
+  notifFilter = filter;
+  document.querySelectorAll('.notif-type-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderNotifs();
+}
+
+function sendNotif() {
+  const titulo = document.getElementById('new-notif-title').value.trim();
+  const msg    = document.getElementById('new-notif-msg').value.trim();
+  const tipo   = document.getElementById('new-notif-tipo').value;
+  if (!titulo || !msg) { showToast('Preencha título e mensagem.', 'warning'); return; }
+
+  const icons = { info:'💬', aviso:'⚠️', sucesso:'✅' };
+  notifications.unshift({
+    id: nextNotifId++, titulo, msg, tipo,
+    icone: icons[tipo] || '🔔',
+    lida: false, tempo: 'agora mesmo'
+  });
+  document.getElementById('new-notif-title').value = '';
+  document.getElementById('new-notif-msg').value   = '';
+  showToast('Aviso enviado para a família!', 'success');
+  renderNotifs();
+}
+
+document.addEventListener('DOMContentLoaded', renderNotifs);
+</script>
+</body>
+</html>

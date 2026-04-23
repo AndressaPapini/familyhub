@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FamilyHub — Finanças</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    .fin-tab {
+      padding: 8px 18px;
+      border-radius: var(--radius-sm);
+      font-size: .88rem;
+      font-weight: 600;
+      border: 1.5px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .fin-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .fin-tab.receita.active { background: var(--success); border-color: var(--success); }
+    .fin-tab.despesa.active { background: var(--danger);  border-color: var(--danger); }
+
+    .trans-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .trans-row:last-child { border-bottom: none; }
+    .trans-icon {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .trans-desc { flex: 1; }
+    .trans-desc .t-name { font-size: .9rem; font-weight: 600; }
+    .trans-desc .t-meta { font-size: .78rem; color: var(--text-muted); margin-top: 2px; }
+    .trans-val { font-size: 1rem; font-weight: 700; min-width: 100px; text-align: right; }
+    .trans-val.receita { color: var(--success); }
+    .trans-val.despesa { color: var(--danger); }
+
+    .goal-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition);
+    }
+    .goal-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🏡</div>
+    <div class="logo-text">Family<span>Hub</span></div>
+  </div>
+  <div class="sidebar-family">
+    <div class="family-label">Família</div>
+    <div class="family-name">Família Parrilla</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="agenda.html"    class="nav-item"><span class="nav-icon">📅</span> Agenda</a>
+    <a href="compras.html"   class="nav-item"><span class="nav-icon">🛒</span> Compras</a>
+    <a href="financas.html"  class="nav-item active"><span class="nav-icon">💰</span> Finanças</a>
+    <a href="missoes.html"   class="nav-item"><span class="nav-icon">⭐</span> Missões</a>
+    <div class="nav-section-label">Comunidade</div>
+    <a href="ranking.html"      class="nav-item"><span class="nav-icon">🏆</span> Ranking</a>
+    <a href="notificacoes.html" class="nav-item"><span class="nav-icon">🔔</span> Notificações <span class="nav-badge">3</span></a>
+    <div class="nav-section-label">Conta</div>
+    <a href="perfil.html" class="nav-item"><span class="nav-icon">👤</span> Meu Perfil</a>
+  </nav>
+  </nav>
+</aside>
+
+<div class="main-wrapper">
+  <header class="topbar">
+    <div class="topbar-title">Finanças Familiares</div>
+    <div class="topbar-actions">
+      <a href="notificacoes.html" class="topbar-btn">🔔 <span class="badge">3</span></a>
+      <div class="topbar-avatar">RP</div>
+    </div>
+  </header>
+
+  <main class="page-content">
+    <div class="page-header">
+      <div>
+        <h1>💰 Finanças</h1>
+        <p>Controle financeiro em tempo real</p>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-success" onclick="openModal('modal-add-trans');setTransTipo('receita')">
+          ➕ Receita
+        </button>
+        <button class="btn btn-danger" onclick="openModal('modal-add-trans');setTransTipo('despesa')">
+          ➖ Despesa
+        </button>
+      </div>
+    </div>
+
+    <div class="stats-grid mb-24">
+      <div class="stat-card">
+        <div class="stat-icon green">💵</div>
+        <div class="stat-info">
+          <div class="stat-value" id="stat-receitas">R$ 0,00</div>
+          <div class="stat-label">Receitas</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon red">💸</div>
+        <div class="stat-info">
+          <div class="stat-value" id="stat-despesas">R$ 0,00</div>
+          <div class="stat-label">Despesas</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple">💰</div>
+        <div class="stat-info">
+          <div class="stat-value" id="stat-saldo">R$ 0,00</div>
+          <div class="stat-label">Saldo Atual</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange">📊</div>
+        <div class="stat-info">
+          <div class="stat-value" id="stat-taxa">0%</div>
+          <div class="stat-label">Uso da Renda</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2-1">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📋 Transações</div>
+            <div class="card-subtitle" id="trans-count">0 transações</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="fin-tab active" id="tab-todas" onclick="filterTrans('todas', this)">Todas</button>
+            <button class="fin-tab receita" id="tab-receita" onclick="filterTrans('receita', this)">Receitas</button>
+            <button class="fin-tab despesa" id="tab-despesa" onclick="filterTrans('despesa', this)">Despesas</button>
+          </div>
+        </div>
+        <div id="trans-list"></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🍩 Por Categoria</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+            <div style="height:150px;width:150px">
+              <canvas id="chart-donut"></canvas>
+            </div>
+            <div id="donut-legend" style="width:100%"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🎯 Metas</div>
+            <button class="btn btn-secondary btn-sm" onclick="openModal('modal-add-meta')">+ Nova</button>
+          </div>
+          <div id="metas-list" style="display:flex;flex-direction:column;gap:14px"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal-add-trans">
+  <div class="modal" style="width:520px">
+    <div class="modal-header">
+      <div class="modal-title">💰 Nova Transação</div>
+      <button class="modal-close" onclick="closeModal('modal-add-trans')">✕</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button class="fin-tab receita" id="btn-tipo-receita" onclick="setTransTipo('receita')" style="flex:1">✅ Receita</button>
+      <button class="fin-tab despesa" id="btn-tipo-despesa" onclick="setTransTipo('despesa')" style="flex:1">❌ Despesa</button>
+    </div>
+    <input type="hidden" id="trans-tipo" value="receita">
+    <div class="form-group">
+      <label class="form-label">Descrição *</label>
+      <input type="text" class="form-control" id="trans-desc">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Valor (R$) *</label>
+        <input type="number" class="form-control" id="trans-valor" step="0.01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data *</label>
+        <input type="date" class="form-control" id="trans-data">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Categoria</label>
+      <select class="form-control" id="trans-cat">
+        <option>Salário</option><option>Extra</option><option>Moradia</option>
+        <option>Alimentação</option><option>Educação</option><option>Saúde</option>
+        <option>Contas</option><option>Transporte</option><option>Lazer</option><option>Outros</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-add-trans')">Cancelar</button>
+      <button class="btn btn-primary" onclick="addTrans()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/layout.js"></script>
+<script>
+let transactions = [
+  { id:1, tipo:'receita', desc:'Salário João', valor:5500, cat:'Salário', data:'2026-04-05' },
+  { id:2, tipo:'receita', desc:'Salário Maria', valor:4200, cat:'Salário', data:'2026-04-05' },
+  { id:3, tipo:'despesa', desc:'Aluguel', valor:1800, cat:'Moradia', data:'2026-04-10' },
+  { id:4, tipo:'despesa', desc:'Supermercado', valor:650, cat:'Alimentação', data:'2026-04-12' }
+];
+
+let metas = [
+  { id:1, titulo:'Viagem de férias', valor:8000, atual:3200, prazo:'2026-12-01', icone:'✈️' }
+];
+
+let transFilter = 'todas';
+const CAT_ICONS = { 'Salário':'💵','Extra':'💡','Moradia':'🏠','Alimentação':'🍽️','Educação':'📚','Saúde':'💊','Contas':'📄','Transporte':'🚗','Lazer':'🎮','Outros':'📦' };
+const CAT_COLORS_FIN = { 'Moradia':'#6C63FF','Alimentação':'#FF6584','Educação':'#43C6AC','Saúde':'#FFB347','Contas':'#FF5C5C','Transporte':'#9B59B6','Lazer':'#3498DB','Outros':'#8A94A6' };
+
+function renderAll() {
+  updateStats();
+  renderTrans();
+  renderMetas();
+  renderCharts();
+}
+
+function updateStats() {
+  const receitas = transactions.filter(t => t.tipo === 'receita').reduce((a,b) => a + b.valor, 0);
+  const despesas = transactions.filter(t => t.tipo === 'despesa').reduce((a,b) => a + b.valor, 0);
+  const saldo = receitas - despesas;
+  const taxa = receitas > 0 ? Math.round((despesas / receitas) * 100) : 0;
+  
+  document.getElementById('stat-receitas').textContent = 'R$ ' + receitas.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+  document.getElementById('stat-despesas').textContent = 'R$ ' + despesas.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+  document.getElementById('stat-saldo').textContent = 'R$ ' + saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+  document.getElementById('stat-taxa').textContent = taxa + '%';
+}
+
+function renderTrans() {
+  let filtered = transFilter === 'todas' ? transactions : transactions.filter(t => t.tipo === transFilter);
+  document.getElementById('trans-count').textContent = `${filtered.length} transação(ões)`;
+  document.getElementById('trans-list').innerHTML = filtered.sort((a,b) => new Date(b.data) - new Date(a.data)).map(t => `
+    <div class="trans-row">
+      <div class="trans-icon" style="background:${t.tipo==='receita'?'#EDFAF4':'#FFF0F0'};color:${t.tipo==='receita'?'var(--success)':'var(--danger)'}">${CAT_ICONS[t.cat]||'💰'}</div>
+      <div class="trans-desc">
+        <div class="t-name">${t.desc}</div>
+        <div class="t-meta">${t.cat} · ${new Date(t.data+'T00:00:00').toLocaleDateString('pt-BR')}</div>
+      </div>
+      <div class="trans-val ${t.tipo}">${t.tipo==='receita'?'+':'-'} R$ ${t.valor.toFixed(2).replace('.',',')}</div>
+      <button class="btn btn-danger btn-sm btn-icon" onclick="deleteTrans(${t.id})">🗑️</button>
+    </div>`).join('') || '<p class="empty-state">Nenhuma transação encontrada.</p>';
+}
+
+function renderMetas() {
+  document.getElementById('metas-list').innerHTML = metas.map(m => {
+    const pct = Math.min(100, Math.round((m.atual / m.valor) * 100));
+    return `<div class="goal-card">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-weight:700">${m.icone} ${m.titulo}</span>
+        <button class="btn btn-icon btn-sm" onclick="deleteMeta(${m.id})">🗑️</button>
+      </div>
+      <div class="progress"><div class="progress-bar" style="width:${pct}%"></div></div>
+      <div style="font-size:.7rem;margin-top:4px;color:var(--text-muted)">${pct}% de R$ ${m.valor.toLocaleString('pt-BR')}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderCharts() {
+  const despesas = transactions.filter(t => t.tipo === 'despesa');
+  if(despesas.length === 0) {
+      document.getElementById('donut-legend').innerHTML = '<p class="empty-state">Sem despesas para exibir.</p>';
+      return;
+  }
+  const cats = {};
+  despesas.forEach(t => { cats[t.cat] = (cats[t.cat] || 0) + t.valor; });
+  const labels = Object.keys(cats);
+  const values = Object.values(cats);
+  const colors = labels.map(l => CAT_COLORS_FIN[l] || '#8A94A6');
+
+  drawDonutChart('chart-donut', values, colors, labels);
+  
+  const total = values.reduce((a,b) => a+b, 0);
+  document.getElementById('donut-legend').innerHTML = labels.map((l,i) => `
+    <div style="display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:4px">
+      <span><i style="display:inline-block;width:8px;height:8px;background:${colors[i]};border-radius:50%"></i> ${l}</span>
+      <b>${Math.round((values[i]/total)*100)}%</b>
+    </div>`).join('');
+}
+
+function addTrans() {
+  const desc = document.getElementById('trans-desc').value;
+  const valor = parseFloat(document.getElementById('trans-valor').value);
+  const data = document.getElementById('trans-data').value;
+  if(!desc || !valor || !data) return;
+  
+  transactions.push({ 
+    id: Date.now(), 
+    tipo: document.getElementById('trans-tipo').value, 
+    desc, 
+    valor, 
+    cat: document.getElementById('trans-cat').value, 
+    data 
+  });
+  
+  closeModal('modal-add-trans');
+  renderAll(); // Atualiza tudo automaticamente
+}
+
+function deleteTrans(id) {
+  transactions = transactions.filter(t => t.id !== id);
+  renderAll(); // Recalcula saldo e gastos
+}
+
+function filterTrans(filter, btn) {
+  transFilter = filter;
+  document.querySelectorAll('.fin-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTrans();
+}
+
+function setTransTipo(tipo) {
+  document.getElementById('trans-tipo').value = tipo;
+  document.getElementById('btn-tipo-receita').classList.toggle('active', tipo === 'receita');
+  document.getElementById('btn-tipo-despesa').classList.toggle('active', tipo === 'despesa');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('trans-data').value = new Date().toISOString().split('T')[0];
+  renderAll();
+});
+</script>
+</body>
+</html>

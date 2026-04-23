@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FamíliaApp — Agenda</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .cal-day-name {
+      background: var(--bg);
+      text-align: center;
+      padding: 10px;
+      font-size: .78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--text-muted);
+    }
+    .cal-day {
+      background: var(--card-bg);
+      min-height: 110px;
+      padding: 8px;
+      cursor: pointer;
+  
+    }
+    .cal-day:hover { background: var(--bg); }
+    .cal-day.today { background: var(--primary-light); }
+    .cal-day.other-month { background: #FAFBFD; }
+    .cal-day .day-num {
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--text);
+      width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+    }
+    .cal-day.today .day-num {
+      background: var(--primary);
+      color: #fff;
+    }
+    .cal-day.other-month .day-num { color: var(--text-muted); opacity: .5; }
+    .cal-event {
+      margin-top: 4px;
+      padding: 3px 7px;
+      border-radius: 4px;
+      font-size: .72rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+    .event-type-filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: .8rem;
+      font-weight: 600;
+      border: 1.5px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .view-btn {
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      font-size: .82rem;
+      font-weight: 600;
+      border: 1.5px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .view-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🏡</div>
+    <div class="logo-text">Família<span>App</span></div>
+  </div>
+  <div class="sidebar-family">
+    <div class="family-label">Família</div>
+    <div class="family-name" id="sb-family-name">Família Silva</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="agenda.html"    class="nav-item active"><span class="nav-icon">📅</span> Agenda</a>
+    <a href="compras.html"   class="nav-item"><span class="nav-icon">🛒</span> Compras</a>
+    <a href="financas.html"  class="nav-item"><span class="nav-icon">💰</span> Finanças</a>
+    <a href="missoes.html"   class="nav-item"><span class="nav-icon">⭐</span> Missões</a>
+    <div class="nav-section-label">Comunidade</div>
+    <a href="ranking.html"      class="nav-item"><span class="nav-icon">🏆</span> Ranking</a>
+    <a href="notificacoes.html" class="nav-item"><span class="nav-icon">🔔</span> Notificações <span class="nav-badge">3</span></a>
+    <div class="nav-section-label">Conta</div>
+    <a href="perfil.html" class="nav-item"><span class="nav-icon">👤</span> Meu Perfil</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sb-avatar">JS</div>
+      <div class="user-info">
+        <div class="user-name" id="sb-user-name">João Silva</div>
+        <div class="user-role" id="sb-user-role">Administrador</div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()" title="Sair">🚪</button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-wrapper">
+  <header class="topbar">
+    <div class="topbar-title">Agenda Familiar</div>
+    <div class="topbar-actions">
+      <a href="notificacoes.html" class="topbar-btn">🔔 <span class="badge">3</span></a>
+      <a href="perfil.html" class="topbar-avatar" id="topbar-avatar">JS</a>
+    </div>
+  </header>
+
+  <main class="page-content">
+
+    <div class="page-header">
+      <div>
+        <h1>📅 Agenda</h1>
+        <p>Organize os compromissos e eventos da família</p>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('modal-add-evento')">
+        ➕ Novo Evento
+      </button>
+    </div>
+
+    <!-- Controles -->
+    <div class="card mb-24">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="btn btn-outline btn-sm" onclick="changeMonth(-1)">‹ Anterior</button>
+          <span id="current-month-label" style="font-size:1rem;font-weight:700;min-width:160px;text-align:center">Abril 2026</span>
+          <button class="btn btn-outline btn-sm" onclick="changeMonth(1)">Próximo ›</button>
+          <button class="btn btn-secondary btn-sm" onclick="goToday()">Hoje</button>
+        </div>
+        <div class="event-type-filters">
+          <button class="filter-btn active" onclick="setFilter('todos', this)">Todos</button>
+          <button class="filter-btn" onclick="setFilter('aniversario', this)">🎂 Aniversários</button>
+          <button class="filter-btn" onclick="setFilter('compromisso', this)">📋 Compromissos</button>
+          <button class="filter-btn" onclick="setFilter('reuniao', this)">👥 Reuniões</button>
+          <button class="filter-btn" onclick="setFilter('evento', this)">🎉 Eventos</button>
+        </div>
+        <div style="display:flex;gap:4px">
+          <button class="view-btn active" id="btn-view-month" onclick="setView('month')">📆 Mês</button>
+          <button class="view-btn" id="btn-view-list" onclick="setView('list')">📋 Lista</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendário mensal -->
+    <div id="view-month">
+      <div class="card">
+        <div class="calendar-grid" id="cal-grid">
+          <!-- Gerado via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista em lista -->
+    <div id="view-list" style="display:none">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Todos os Eventos</div>
+          <span class="badge badge-primary" id="events-count">4 eventos</span>
+        </div>
+        <div id="events-list-view"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Modal adicionar evento -->
+<div class="modal-overlay" id="modal-add-evento">
+  <div class="modal" style="width:520px">
+    <div class="modal-header">
+      <div class="modal-title">📅 Novo Evento</div>
+      <button class="modal-close" onclick="closeModal('modal-add-evento')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Título do evento *</label>
+      <input type="text" class="form-control" id="ev-titulo" placeholder="Ex: Aniversário da vovó">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tipo</label>
+      <select class="form-control" id="ev-tipo">
+        <option value="evento">🎉 Evento</option>
+        <option value="aniversario">🎂 Aniversário</option>
+        <option value="compromisso">📋 Compromisso</option>
+        <option value="reuniao">👥 Reunião</option>
+        <option value="outro">📌 Outro</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Data início *</label>
+        <input type="datetime-local" class="form-control" id="ev-inicio">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data fim</label>
+        <input type="datetime-local" class="form-control" id="ev-fim">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Local</label>
+      <input type="text" class="form-control" id="ev-local" placeholder="Onde será o evento?">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição</label>
+      <textarea class="form-control" id="ev-desc" rows="3" placeholder="Detalhes do evento..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Cor</label>
+      <div style="display:flex;gap:8px">
+        <div class="color-opt" style="width:28px;height:28px;border-radius:50%;background:#6C63FF;cursor:pointer;border:3px solid #6C63FF" onclick="selectColor('#6C63FF', this)"></div>
+        <div class="color-opt" style="width:28px;height:28px;border-radius:50%;background:#FF6584;cursor:pointer" onclick="selectColor('#FF6584', this)"></div>
+        <div class="color-opt" style="width:28px;height:28px;border-radius:50%;background:#43C6AC;cursor:pointer" onclick="selectColor('#43C6AC', this)"></div>
+        <div class="color-opt" style="width:28px;height:28px;border-radius:50%;background:#FFB347;cursor:pointer" onclick="selectColor('#FFB347', this)"></div>
+        <div class="color-opt" style="width:28px;height:28px;border-radius:50%;background:#FF5C5C;cursor:pointer" onclick="selectColor('#FF5C5C', this)"></div>
+      </div>
+      <input type="hidden" id="ev-cor" value="#6C63FF">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-add-evento')">Cancelar</button>
+      <button class="btn btn-primary" onclick="addEvent()">Salvar Evento</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal detalhes evento -->
+<div class="modal-overlay" id="modal-detail-evento">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="detail-title">Evento</div>
+      <button class="modal-close" onclick="closeModal('modal-detail-evento')">✕</button>
+    </div>
+    <div id="detail-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" onclick="deleteEvent()">🗑️ Excluir</button>
+      <button class="btn btn-outline" onclick="closeModal('modal-detail-evento')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/layout.js"></script>
+<script>
+// ── Dados dos eventos ──────────────────────────────────────
+let events = [
+  { id:1, titulo:'Reunião Familiar',       tipo:'reuniao',      inicio:'2026-04-20T19:00', fim:'2026-04-20T21:00', local:'Sala de estar',    cor:'#6C63FF', desc:'Planejamento do mês' },
+  { id:2, titulo:'Churrasco de domingo',   tipo:'evento',       inicio:'2026-05-26T12:00', fim:'2026-04-26T18:00', local:'Quintal',           cor:'#FFB347', desc:'Família toda reunida' },
+  { id:3, titulo:'Aniversário da Merlotto',   tipo:'aniversario',       inicio:'2026-05-07T12:00', fim:'2026-04-26T18:00', local:'Casa',           cor:'#FF6584', desc:'Família toda reunida' },
+
+];
+
+let currentDate = new Date(2026, 3, 1); // Abril 2026
+let currentFilter = 'todos';
+let currentView   = 'month';
+let selectedColor = '#6C63FF';
+let selectedEventId = null;
+
+// ── Meses ─────────────────────────────────────────────────
+const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DAYS   = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+// ── Renderizar calendário ─────────────────────────────────
+function renderCalendar() {
+  document.getElementById('current-month-label').textContent =
+    `${MONTHS[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+
+  const year  = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  const today = new Date();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrev  = new Date(year, month, 0).getDate();
+
+  let html = DAYS.map(d => `<div class="cal-day-name">${d}</div>`).join('');
+
+  const filteredEvents = events.filter(e =>
+    currentFilter === 'todos' || e.tipo === currentFilter
+  );
+
+  for (let i = 0; i < firstDay; i++) {
+    const d = daysInPrev - firstDay + i + 1;
+    html += `<div class="cal-day other-month"><div class="day-num">${d}</div></div>`;
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+    const dayEvents = filteredEvents.filter(e => e.inicio.startsWith(dateStr));
+
+    let evHtml = dayEvents.slice(0,3).map(e =>
+      `<div class="cal-event" style="background:${e.cor}22;color:${e.cor}" onclick="showEvent(${e.id})" title="${e.titulo}">${e.titulo}</div>`
+    ).join('');
+    if (dayEvents.length > 3) evHtml += `<div style="font-size:.68rem;color:var(--text-muted);margin-top:2px">+${dayEvents.length-3} mais</div>`;
+
+    html += `<div class="cal-day${isToday?' today':''}" onclick="clickDay('${dateStr}')">
+               <div class="day-num">${d}</div>${evHtml}
+             </div>`;
+  }
+
+  const remaining = 42 - firstDay - daysInMonth;
+  for (let d = 1; d <= remaining; d++) {
+    html += `<div class="cal-day other-month"><div class="day-num">${d}</div></div>`;
+  }
+
+  document.getElementById('cal-grid').innerHTML = html;
+  renderListView();
+}
+
+// ── Vista em lista ─────────────────────────────────────────
+function renderListView() {
+  const filtered = events.filter(e => currentFilter === 'todos' || e.tipo === currentFilter);
+  document.getElementById('events-count').textContent = `${filtered.length} evento(s)`;
+
+  if (!filtered.length) {
+    document.getElementById('events-list-view').innerHTML =
+      '<div class="empty-state"><div class="empty-icon">📅</div><p>Nenhum evento encontrado.</p></div>';
+    return;
+  }
+
+  const typeLabels = { evento:'Evento', aniversario:'Aniversário', compromisso:'Compromisso', reuniao:'Reunião', outro:'Outro' };
+  const badgeClass = { evento:'badge-warning', aniversario:'badge-pink', compromisso:'badge-success', reuniao:'badge-primary', outro:'badge-muted' };
+
+  document.getElementById('events-list-view').innerHTML = filtered.map(e => {
+    const dt = new Date(e.inicio);
+    const day = dt.getDate();
+    const mon = MONTHS[dt.getMonth()].substring(0,3).toUpperCase();
+    const time = dt.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+    return `<div style="display:flex;gap:16px;padding:14px 0;border-bottom:1px solid var(--border);align-items:center">
+      <div style="width:52px;text-align:center;flex-shrink:0">
+        <div style="font-size:.68rem;color:var(--text-muted)">${mon}</div>
+        <div style="font-size:1.5rem;font-weight:800;color:${e.cor};line-height:1">${day}</div>
+      </div>
+      <div style="width:4px;height:40px;border-radius:4px;background:${e.cor};flex-shrink:0"></div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:.95rem">${e.titulo}</div>
+        <div style="font-size:.8rem;color:var(--text-muted);margin-top:2px">🕐 ${time}${e.local ? ' · 📍 '+e.local : ''}</div>
+        ${e.desc ? `<div style="font-size:.8rem;color:var(--text-muted);margin-top:2px">${e.desc}</div>` : ''}
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="badge ${badgeClass[e.tipo]||'badge-muted'}">${typeLabels[e.tipo]||e.tipo}</span>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="showEvent(${e.id})" title="Ver detalhes">👁️</button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteEventById(${e.id})" title="Excluir">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Detalhes do evento ─────────────────────────────────────
+function showEvent(id) {
+  const e = events.find(ev => ev.id === id);
+  if (!e) return;
+  selectedEventId = id;
+  document.getElementById('detail-title').textContent = e.titulo;
+  const dt = new Date(e.inicio);
+  document.getElementById('detail-body').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;gap:10px;align-items:center">
+        <div style="width:12px;height:12px;border-radius:50%;background:${e.cor}"></div>
+        <span class="badge" style="background:${e.cor}22;color:${e.cor}">${e.tipo}</span>
+      </div>
+      <div><strong>📅 Data:</strong> ${dt.toLocaleDateString('pt-BR')} às ${dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>
+      ${e.local ? `<div><strong>📍 Local:</strong> ${e.local}</div>` : ''}
+      ${e.desc  ? `<div><strong>📝 Descrição:</strong> ${e.desc}</div>` : ''}
+    </div>`;
+  openModal('modal-detail-evento');
+}
+
+function deleteEvent() {
+  if (selectedEventId) deleteEventById(selectedEventId);
+  closeModal('modal-detail-evento');
+}
+
+function deleteEventById(id) {
+  events = events.filter(e => e.id !== id);
+  renderCalendar();
+  showToast('Evento excluído.', 'danger');
+}
+
+// ── Adicionar evento ───────────────────────────────────────
+function addEvent() {
+  const titulo = document.getElementById('ev-titulo').value.trim();
+  const tipo   = document.getElementById('ev-tipo').value;
+  const inicio = document.getElementById('ev-inicio').value;
+  const fim    = document.getElementById('ev-fim').value;
+  const local  = document.getElementById('ev-local').value.trim();
+  const desc   = document.getElementById('ev-desc').value.trim();
+
+  if (!titulo || !inicio) { showToast('Preencha título e data.', 'warning'); return; }
+
+  const newId = Math.max(...events.map(e => e.id), 0) + 1;
+  events.push({ id: newId, titulo, tipo, inicio, fim: fim || null, local, cor: selectedColor, desc });
+  renderCalendar();
+  closeModal('modal-add-evento');
+  showToast('Evento adicionado!', 'success');
+
+  // Limpar form
+  ['ev-titulo','ev-inicio','ev-fim','ev-local','ev-desc'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+}
+
+// ── Controles ──────────────────────────────────────────────
+function changeMonth(dir) {
+  currentDate.setMonth(currentDate.getMonth() + dir);
+  renderCalendar();
+}
+
+function goToday() {
+  currentDate = new Date();
+  renderCalendar();
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCalendar();
+}
+
+function setView(view) {
+  currentView = view;
+  document.getElementById('view-month').style.display = view === 'month' ? '' : 'none';
+  document.getElementById('view-list').style.display  = view === 'list'  ? '' : 'none';
+  document.getElementById('btn-view-month').classList.toggle('active', view === 'month');
+  document.getElementById('btn-view-list').classList.toggle('active',  view === 'list');
+}
+
+function clickDay(dateStr) {
+  document.getElementById('ev-inicio').value = dateStr + 'T09:00';
+  openModal('modal-add-evento');
+}
+
+function selectColor(color, el) {
+  selectedColor = color;
+  document.getElementById('ev-cor').value = color;
+  document.querySelectorAll('.color-opt').forEach(c => c.style.border = 'none');
+  el.style.border = `3px solid ${color}`;
+}
+
+function filterEvents(q) {
+  // Filtro de busca simples
+  const term = q.toLowerCase();
+  document.querySelectorAll('.cal-event').forEach(el => {
+    el.style.display = el.title.toLowerCase().includes(term) ? '' : 'none';
+  });
+}
+
+document.addEventListener('DOMContentLoaded', renderCalendar);
+</script>
+</body>
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FamilyHub — Ranking</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    .rank-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .rank-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .rank-card.first  { border-color: #FFD700; background: linear-gradient(135deg, #FFFBEA, #fff); }
+    .rank-card.second { border-color: #C0C0C0; background: linear-gradient(135deg, #F8F8F8, #fff); }
+    .rank-card.third  { border-color: #CD7F32; background: linear-gradient(135deg, #FFF5EE, #fff); }
+    .rank-card.me     { border-color: var(--primary); background: var(--primary-light); }
+    .rank-num-big {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .rank-num-big.gold   { background: linear-gradient(135deg,#FFD700,#FFA500); color:#fff; box-shadow:0 4px 14px rgba(255,165,0,.4); }
+    .rank-num-big.silver { background: linear-gradient(135deg,#C0C0C0,#A0A0A0); color:#fff; box-shadow:0 4px 14px rgba(160,160,160,.4); }
+    .rank-num-big.bronze { background: linear-gradient(135deg,#CD7F32,#A0522D); color:#fff; box-shadow:0 4px 14px rgba(160,82,45,.4); }
+    .rank-num-big.other  { background: var(--bg); color: var(--text-muted); }
+    .rank-avatar-big {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+      border: 3px solid #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,.12);
+    }
+    .rank-info { flex: 1; }
+    .rank-name { font-size: 1rem; font-weight: 700; }
+    .rank-role { font-size: .78rem; color: var(--text-muted); }
+    .rank-pts-big {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .rank-pts-label { font-size: .72rem; color: var(--text-muted); text-align: right; }
+    .rank-change {
+      font-size: .75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 99px;
+    }
+    .rank-change.up   { background: #EDFAF4; color: var(--success); }
+    .rank-change.down { background: #FFF0F0; color: var(--danger); }
+    .rank-change.same { background: var(--bg); color: var(--text-muted); }
+    .crown-badge {
+      position: absolute;
+      top: -2px; right: 16px;
+      font-size: 1.6rem;
+    }
+    .achievement-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all var(--transition);
+    }
+    .achievement-card:hover { border-color: var(--primary); }
+    .achievement-card.locked { opacity: .5; filter: grayscale(1); }
+    .ach-icon {
+      font-size: 1.8rem;
+      width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg);
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+    .ach-info .ach-name { font-size: .85rem; font-weight: 700; }
+    .ach-info .ach-desc { font-size: .75rem; color: var(--text-muted); margin-top: 2px; }
+    .history-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .85rem;
+    }
+    .history-row:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🏡</div>
+    <div class="logo-text">Família<span>App</span></div>
+  </div>
+  <div class="sidebar-family">
+    <div class="family-label">Família</div>
+    <div class="family-name" id="sb-family-name">Família Parrilla</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="agenda.html"    class="nav-item"><span class="nav-icon">📅</span> Agenda</a>
+    <a href="compras.html"   class="nav-item"><span class="nav-icon">🛒</span> Compras</a>
+    <a href="financas.html"  class="nav-item"><span class="nav-icon">💰</span> Finanças</a>
+    <a href="missoes.html"   class="nav-item"><span class="nav-icon">⭐</span> Missões</a>
+    <div class="nav-section-label">Comunidade</div>
+    <a href="ranking.html"      class="nav-item active"><span class="nav-icon">🏆</span> Ranking</a>
+    <a href="notificacoes.html" class="nav-item"><span class="nav-icon">🔔</span> Notificações <span class="nav-badge">3</span></a>
+    <div class="nav-section-label">Conta</div>
+    <a href="perfil.html" class="nav-item"><span class="nav-icon">👤</span> Meu Perfil</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sb-avatar">RP</div>
+      <div class="user-info">
+        <div class="user-name" id="sb-user-name">Rafaela Parrilla</div>
+        <div class="user-role">Administrador</div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()" title="Sair">🚪</button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-wrapper">
+  <header class="topbar">
+    <div class="topbar-title">Ranking Familiar</div>
+    <div class="topbar-actions">
+      <a href="notificacoes.html" class="topbar-btn">🔔 <span class="badge">3</span></a>
+      <a href="perfil.html" class="topbar-avatar" id="topbar-avatar">RP</a>
+    </div>
+  </header>
+
+  <main class="page-content">
+
+    <div class="page-header">
+      <div>
+        <h1>🏆 Ranking</h1>
+        <p>Quem está se destacando mais na família este mês?</p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline btn-sm" id="btn-period-mes"  onclick="setPeriod('mes', this)"  style="font-size:.82rem">Este mês</button>
+        <button class="btn btn-primary btn-sm" id="btn-period-total" onclick="setPeriod('total', this)" style="font-size:.82rem">Total</button>
+      </div>
+    </div>
+
+    <!-- Pódio -->
+    <div class="card mb-24" style="background:linear-gradient(135deg,#1E1E2E,#2A2A3E);border:none;overflow:hidden;position:relative">
+      <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:rgba(108,99,255,.1)"></div>
+      <div style="position:absolute;bottom:-40px;left:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,101,132,.08)"></div>
+
+      <div style="text-align:center;padding:8px 0 20px;position:relative">
+        <div style="font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:4px">Ranking da Família Parrilla</div>
+        <div style="font-size:1.2rem;font-weight:800;color:#fff">🏆 Pódio do Mês</div>
+      </div>
+
+      <div class="rank-podium" style="position:relative">
+        <!-- 2º lugar -->
+        <div class="podium-item">
+          <div style="position:relative">
+            <div class="podium-avatar" style="background:var(--secondary);width:60px;height:60px;font-size:1.1rem">AP</div>
+          </div>
+          <div class="podium-name" style="color:#fff">Andressa</div>
+          <div class="podium-pts" style="color:rgba(255,255,255,.6)">280 pts</div>
+          <div class="podium-block second">2</div>
+        </div>
+
+        <!-- 1º lugar -->
+        <div class="podium-item">
+          <div style="position:relative">
+            <div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:1.4rem">👑</div>
+            <div class="podium-avatar" style="background:var(--primary);width:72px;height:72px;font-size:1.3rem;border:3px solid #FFD700">RP</div>
+          </div>
+          <div class="podium-name" style="color:#fff;font-size:.95rem;font-weight:800">Rafaela</div>
+          <div class="podium-pts" style="color:#FFD700;font-weight:700">320 pts</div>
+          <div class="podium-block first">1</div>
+        </div>
+
+        <!-- 3º lugar -->
+        <div class="podium-item">
+          <div class="podium-avatar" style="background:var(--accent)">IP</div>
+          <div class="podium-name" style="color:#fff">Isabelli Parrilla</div>
+          <div class="podium-pts" style="color:rgba(255,255,255,.6)">195 pts</div>
+          <div class="podium-block third">3</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2-1">
+
+      <!-- Lista completa -->
+      <div>
+        <div style="display:flex;flex-direction:column;gap:12px" id="ranking-list">
+          <!-- Gerado via JS -->
+        </div>
+      </div>
+
+      <!-- Painel lateral -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- Conquistas -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🎖️ Conquistas</div>
+            <span class="badge badge-primary">4/8</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="achievements-grid">
+            <!-- Gerado via JS -->
+          </div>
+        </div>
+
+        <!-- Histórico de pontos -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📊 Histórico de Pontos</div>
+          </div>
+          <div>
+            <div class="history-row">
+              <span style="font-size:1rem">⭐</span>
+              <div style="flex:1"><div style="font-weight:600">Missão concluída</div><div style="font-size:.75rem;color:var(--text-muted)">Leitura em família</div></div>
+              <span style="color:var(--success);font-weight:700">+20 pts</span>
+            </div>
+            <div class="history-row">
+              <span style="font-size:1rem">🛒</span>
+              <div style="flex:1"><div style="font-weight:600">Compras feitas</div><div style="font-size:.75rem;color:var(--text-muted)">Lista da semana</div></div>
+              <span style="color:var(--success);font-weight:700">+10 pts</span>
+            </div>
+            <div class="history-row">
+              <span style="font-size:1rem">📅</span>
+              <div style="flex:1"><div style="font-weight:600">Evento criado</div><div style="font-size:.75rem;color:var(--text-muted)">Churrasco</div></div>
+              <span style="color:var(--success);font-weight:700">+5 pts</span>
+            </div>
+            <div class="history-row">
+              <span style="font-size:1rem">💰</span>
+              <div style="flex:1"><div style="font-weight:600">Meta atingida</div><div style="font-size:.75rem;color:var(--text-muted)">Fundo emergência 65%</div></div>
+              <span style="color:var(--success);font-weight:700">+15 pts</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/layout.js"></script>
+<script>
+const members = [
+  { id:1, nome:'Rafaela Parrila',  iniciais:'RP', pts:320, pts_mes:120, papel:'Administrador', cor:'var(--primary)',   missoes:8, change:'up'   },
+  { id:2, nome:'Andressa Parrilla', iniciais:'AP', pts:280, pts_mes:95,  papel:'Membro',        cor:'var(--secondary)', missoes:6, change:'same' },
+  { id:3, nome:'Isabelli Parrilla', iniciais:'IP', pts:195, pts_mes:80,  papel:'Membro',        cor:'var(--accent)',    missoes:4, change:'up'   },
+  { id:4, nome:'Gustavo Parrilla',   iniciais:'GP', pts:150, pts_mes:60,  papel:'Membro',        cor:'var(--warning)',   missoes:3, change:'down' },
+  { id:4, nome:'Rafael Parrilla',   iniciais:'RP', pts:150, pts_mes:60,  papel:'Membro',        cor:'var(--warning)',   missoes:3, change:'down' },
+];
+
+const achievements = [
+  { icone:'🏆', nome:'Campeão',       desc:'1º no ranking',   desbloqueada:true  },
+  { icone:'⭐', nome:'Missão 5x',     desc:'5 missões feitas', desbloqueada:true  },
+  { icone:'🛒', nome:'Comprador',     desc:'10 listas feitas', desbloqueada:true  },
+  { icone:'💰', nome:'Poupador',      desc:'Meta atingida',    desbloqueada:true  },
+  { icone:'📅', nome:'Organizador',   desc:'10 eventos',       desbloqueada:false },
+  { icone:'🌱', nome:'Verde',         desc:'Horta plantada',   desbloqueada:false },
+  { icone:'🍳', nome:'Chef',          desc:'Sem delivery 7d',  desbloqueada:false },
+  { icone:'📚', nome:'Leitor',        desc:'Leitura 30 dias',  desbloqueada:false },
+];
+
+let period = 'total';
+
+const rankClasses = ['first','second','third','',''];
+const numClasses  = ['gold','silver','bronze','other','other'];
+const medals      = ['🥇','🥈','🥉','4','5'];
+
+function renderRanking() {
+  const sorted = [...members].sort((a,b) =>
+    period === 'mes' ? b.pts_mes - a.pts_mes : b.pts - a.pts
+  );
+
+  document.getElementById('ranking-list').innerHTML = sorted.map((m, i) => {
+    const pts = period === 'mes' ? m.pts_mes : m.pts;
+    const maxPts = period === 'mes' ? sorted[0].pts_mes : sorted[0].pts;
+    const pct = Math.round((pts / maxPts) * 100);
+    const changeLabel = m.change === 'up' ? '▲ Subiu' : m.change === 'down' ? '▼ Desceu' : '— Igual';
+    const isMe = m.id === 1;
+
+    return `<div class="rank-card ${rankClasses[i]}${isMe?' me':''}">
+      ${i === 0 ? '<div class="crown-badge">👑</div>' : ''}
+      <div class="rank-num-big ${numClasses[i]}">${medals[i]}</div>
+      <div class="rank-avatar-big" style="background:${m.cor}">${m.iniciais}</div>
+      <div class="rank-info">
+        <div class="rank-name">${m.nome}${isMe?' <span style="font-size:.72rem;color:var(--primary)">(você)</span>':''}</div>
+        <div class="rank-role">${m.papel}</div>
+        <div style="margin-top:6px">
+          <div class="progress" style="height:5px">
+            <div class="progress-bar primary" style="width:${pct}%"></div>
+          </div>
+        </div>
+        <div style="font-size:.72rem;color:var(--text-muted);margin-top:3px">${m.missoes} missões concluídas</div>
+      </div>
+      <div style="text-align:right">
+        <div class="rank-pts-big">${pts}</div>
+        <div class="rank-pts-label">pontos</div>
+        <div class="rank-change ${m.change}" style="margin-top:6px">${changeLabel}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAchievements() {
+  document.getElementById('achievements-grid').innerHTML = achievements.map(a =>
+    `<div class="achievement-card${!a.desbloqueada?' locked':''}">
+      <div class="ach-icon">${a.icone}</div>
+      <div class="ach-info">
+        <div class="ach-name">${a.nome}</div>
+        <div class="ach-desc">${a.desc}</div>
+      </div>
+    </div>`
+  ).join('');
+}
+
+function setPeriod(p, btn) {
+  period = p;
+  document.querySelectorAll('[id^="btn-period"]').forEach(b => {
+    b.className = 'btn btn-outline btn-sm';
+    b.style.fontSize = '.82rem';
+  });
+  btn.className = 'btn btn-primary btn-sm';
+  btn.style.fontSize = '.82rem';
+  renderRanking();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderRanking();
+  renderAchievements();
+});
+</script>
+</body>
+</html>

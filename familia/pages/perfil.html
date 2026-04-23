@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FamíliaApp — Meu Perfil</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    .profile-tab {
+      padding: 9px 20px;
+      border-radius: var(--radius-sm);
+      font-size: .88rem;
+      font-weight: 600;
+      border: 1.5px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .profile-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .avatar-picker {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .avatar-opt {
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: all var(--transition);
+    }
+    .avatar-opt:hover, .avatar-opt.selected { border-color: var(--primary); transform: scale(1.1); }
+    .member-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition);
+    }
+    .member-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .activity-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem;
+      flex-shrink: 0;
+    }
+    .level-bar-wrap {
+      background: var(--bg);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .level-num {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🏡</div>
+    <div class="logo-text">Família<span>App</span></div>
+  </div>
+  <div class="sidebar-family">
+    <div class="family-label">Família</div>
+    <div class="family-name" id="sb-family-name">Família Parrilla</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="agenda.html"    class="nav-item"><span class="nav-icon">📅</span> Agenda</a>
+    <a href="compras.html"   class="nav-item"><span class="nav-icon">🛒</span> Compras</a>
+    <a href="financas.html"  class="nav-item"><span class="nav-icon">💰</span> Finanças</a>
+    <a href="missoes.html"   class="nav-item"><span class="nav-icon">⭐</span> Missões</a>
+    <div class="nav-section-label">Comunidade</div>
+    <a href="ranking.html"      class="nav-item"><span class="nav-icon">🏆</span> Ranking</a>
+    <a href="notificacoes.html" class="nav-item"><span class="nav-icon">🔔</span> Notificações <span class="nav-badge">3</span></a>
+    <div class="nav-section-label">Conta</div>
+    <a href="perfil.html" class="nav-item active"><span class="nav-icon">👤</span> Meu Perfil</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sb-avatar">RP</div>
+      <div class="user-info">
+        <div class="user-name" id="sb-user-name">Rafaela Parrilla</div>
+        <div class="user-role">Administrador</div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()" title="Sair">🚪</button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-wrapper">
+  <header class="topbar">
+    <div class="topbar-title">Meu Perfil</div>
+    <div class="topbar-actions">
+      <a href="notificacoes.html" class="topbar-btn">🔔 <span class="badge">3</span></a>
+      <a href="perfil.html" class="topbar-avatar" id="topbar-avatar">JS</a>
+    </div>
+  </header>
+
+  <main class="page-content">
+
+    <!-- Capa e info -->
+    <div class="mb-24">
+      <div class="profile-cover" id="profile-cover">
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar" id="profile-avatar-display">JS</div>
+        </div>
+
+      </div>
+      <div class="profile-info-card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between">
+          <div>
+            <div class="profile-name" id="profile-name-display">Rafaela Parrilla</div>
+            <div class="profile-role" id="profile-role-display">👑 Administrador da família</div>
+            <div style="font-size:.82rem;color:var(--text-muted);margin-top:4px" id="profile-email-display">rafaela@familia.com</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary" onclick="switchTab('editar')">✏️ Editar perfil</button>
+            <button class="btn btn-danger" onclick="doLogout()">🚪 Sair</button>
+          </div>
+        </div>
+
+        <div class="profile-stats">
+          <div class="profile-stat-item">
+            <div class="val">320</div>
+            <div class="lbl">Pontos</div>
+          </div>
+          <div class="profile-stat-item">
+            <div class="val">🥇 1º</div>
+            <div class="lbl">Ranking</div>
+          </div>
+          <div class="profile-stat-item">
+            <div class="val">8</div>
+            <div class="lbl">Missões</div>
+          </div>
+          <div class="profile-stat-item">
+            <div class="val">4</div>
+            <div class="lbl">Conquistas</div>
+          </div>
+          <div class="profile-stat-item">
+            <div class="val">Abr/2026</div>
+            <div class="lbl">Membro desde</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:8px;margin-bottom:20px">
+      <button class="profile-tab active" id="tab-btn-visao"   onclick="switchTab('visao')">📊 Visão geral</button>
+      <button class="profile-tab"        id="tab-btn-editar"  onclick="switchTab('editar')">✏️ Editar perfil</button>
+      <button class="profile-tab"        id="tab-btn-familia" onclick="switchTab('familia')">👨‍👩‍👧‍👦 Família</button>
+      <button class="profile-tab"        id="tab-btn-seguranca" onclick="switchTab('seguranca')">🔒 Segurança</button>
+    </div>
+
+    <!-- TAB: Visão geral -->
+    <div id="tab-visao">
+      <div class="grid-2">
+        <!-- Nível e XP -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⚡ Nível e Experiência</div>
+          </div>
+          <div class="level-bar-wrap">
+            <div style="display:flex;align-items:center;gap:16px">
+              <div class="level-num">Nv. 8</div>
+              <div style="flex:1">
+                <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:6px">
+                  <span style="font-weight:600">Guardião da Família</span>
+                  <span style="color:var(--text-muted)">320 / 400 XP</span>
+                </div>
+                <div class="progress" style="height:12px">
+                  <div class="progress-bar primary" style="width:80%"></div>
+                </div>
+                <div style="font-size:.75rem;color:var(--text-muted);margin-top:4px">Faltam 80 XP para o Nível 9</div>
+              </div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+            <div style="text-align:center;padding:12px;background:var(--bg);border-radius:10px">
+              <div style="font-size:1.3rem;font-weight:800;color:var(--primary)">8</div>
+              <div style="font-size:.75rem;color:var(--text-muted)">Missões</div>
+            </div>
+            <div style="text-align:center;padding:12px;background:var(--bg);border-radius:10px">
+              <div style="font-size:1.3rem;font-weight:800;color:var(--success)">4</div>
+              <div style="font-size:.75rem;color:var(--text-muted)">Conquistas</div>
+            </div>
+            <div style="text-align:center;padding:12px;background:var(--bg);border-radius:10px">
+              <div style="font-size:1.3rem;font-weight:800;color:var(--warning)">🥇</div>
+              <div style="font-size:.75rem;color:var(--text-muted)">Ranking</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Atividade recente -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🕐 Atividade Recente</div>
+          </div>
+          <div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#EDFAF4;color:var(--success)">✅</div>
+              <div>
+                <div style="font-size:.88rem;font-weight:600">Missão concluída</div>
+                <div style="font-size:.78rem;color:var(--text-muted)">Leitura em família · +20 pts</div>
+                <div style="font-size:.72rem;color:var(--text-muted)">2 dias atrás</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#EEF0FF;color:var(--primary)">📅</div>
+              <div>
+                <div style="font-size:.88rem;font-weight:600">Evento criado</div>
+                <div style="font-size:.78rem;color:var(--text-muted)">Churrasco de domingo · +5 pts</div>
+                <div style="font-size:.72rem;color:var(--text-muted)">3 dias atrás</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#FFF6EC;color:var(--warning)">🛒</div>
+              <div>
+                <div style="font-size:.88rem;font-weight:600">Itens comprados</div>
+                <div style="font-size:.78rem;color:var(--text-muted)">Lista da semana · +10 pts</div>
+                <div style="font-size:.72rem;color:var(--text-muted)">4 dias atrás</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:#EDFAF4;color:var(--success)">💰</div>
+              <div>
+                <div style="font-size:.88rem;font-weight:600">Meta financeira</div>
+                <div style="font-size:.78rem;color:var(--text-muted)">Fundo emergência 65% · +15 pts</div>
+                <div style="font-size:.72rem;color:var(--text-muted)">5 dias atrás</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Editar perfil -->
+    <div id="tab-editar" style="display:none">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">✏️ Informações Pessoais</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nome completo</label>
+            <input type="text" class="form-control" id="edit-nome" value="Rafaela Parrilla">
+          </div>
+          <div class="form-group">
+            <label class="form-label">E-mail</label>
+            <input type="email" class="form-control" id="edit-email" value="rafaela@familia.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Telefone</label>
+            <input type="tel" class="form-control" id="edit-tel" placeholder="(11) 99999-9999">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data de nascimento</label>
+            <input type="date" class="form-control" id="edit-nasc" value="2009-05-07">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sobre mim</label>
+            <textarea class="form-control" id="edit-bio" rows="3" placeholder="Conte um pouco sobre você...">Apaixonada por tecnologia.</textarea>
+          </div>
+          <button class="btn btn-primary" onclick="saveProfile()">💾 Salvar alterações</button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🎨 Avatar</div>
+          </div>
+          <div style="text-align:center;margin-bottom:20px">
+            <div class="profile-avatar" style="width:80px;height:80px;font-size:2rem;margin:0 auto" id="avatar-preview">JS</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Escolha um emoji como avatar</label>
+            <div class="avatar-picker">
+              <div class="avatar-opt selected" style="background:#EEF0FF" onclick="selectAvatar('👨', this)">👨</div>
+              <div class="avatar-opt" style="background:#FFF0F3" onclick="selectAvatar('👩', this)">👩</div>
+              <div class="avatar-opt" style="background:#EDFAF4" onclick="selectAvatar('👦', this)">👦</div>
+              <div class="avatar-opt" style="background:#FFF6EC" onclick="selectAvatar('👧', this)">👧</div>
+              <div class="avatar-opt" style="background:#EEF0FF" onclick="selectAvatar('🧔', this)">🧔</div>
+              <div class="avatar-opt" style="background:#FFF0F3" onclick="selectAvatar('👴', this)">👴</div>
+              <div class="avatar-opt" style="background:#EDFAF4" onclick="selectAvatar('👵', this)">👵</div>
+              <div class="avatar-opt" style="background:#FFF6EC" onclick="selectAvatar('🧒', this)">🧒</div>
+            </div>
+          </div>
+          <div class="form-group mt-16">
+            <label class="form-label">Cor do perfil</label>
+            <div style="display:flex;gap:8px">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--primary);cursor:pointer;border:3px solid var(--primary)" onclick="selectColor('var(--primary)', this)"></div>
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--secondary);cursor:pointer" onclick="selectColor('var(--secondary)', this)"></div>
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--accent);cursor:pointer" onclick="selectColor('var(--accent)', this)"></div>
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--warning);cursor:pointer" onclick="selectColor('var(--warning)', this)"></div>
+              <div style="width:32px;height:32px;border-radius:50%;background:#9B59B6;cursor:pointer" onclick="selectColor('#9B59B6', this)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Família -->
+    <div id="tab-familia" style="display:none">
+      <div class="grid-2">
+        <div>
+          <div class="card mb-16">
+            <div class="card-header">
+              <div>
+                <div class="card-title">👨‍👩‍👧‍👦 Família Parrilla</div>
+                <div class="card-subtitle">Código: <strong>PARRILLA2026</strong></div>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="copyCode()">📋 Copiar código</button>
+            </div>
+            <div style="background:var(--bg);border-radius:10px;padding:14px;text-align:center;margin-bottom:16px">
+              <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:4px">Código de convite</div>
+              <div style="font-size:1.8rem;font-weight:800;letter-spacing:.15em;color:var(--primary)">PARRILLA2026</div>
+              <div style="font-size:.78rem;color:var(--text-muted);margin-top:4px">Compartilhe este código para convidar novos membros</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px" id="members-list">
+              <!-- Gerado via JS -->
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card mb-16">
+            <div class="card-header">
+              <div class="card-title">➕ Convidar Membro</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">E-mail do convidado</label>
+              <input type="email" class="form-control" id="invite-email" placeholder="email@exemplo.com">
+            </div>
+            <button class="btn btn-primary w-full" onclick="sendInvite()">📧 Enviar convite</button>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">⚙️ Configurações da Família</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nome da família</label>
+              <input type="text" class="form-control" value="Família Parrilla">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Descrição</label>
+              <textarea class="form-control" rows="2">Nossa família unida! 💪</textarea>
+            </div>
+            <button class="btn btn-primary" onclick="showToast('Configurações salvas!','success')">💾 Salvar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Segurança -->
+    <div id="tab-seguranca" style="display:none">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔒 Alterar Senha</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Senha atual</label>
+            <input type="password" class="form-control" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nova senha</label>
+            <input type="password" class="form-control" id="new-pass" placeholder="Mínimo 6 caracteres">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirmar nova senha</label>
+            <input type="password" class="form-control" id="confirm-pass" placeholder="Repita a nova senha">
+          </div>
+          <button class="btn btn-primary" onclick="changePassword()">🔒 Alterar senha</button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⚠️ Zona de Perigo</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="padding:14px;background:#FFF0F0;border-radius:10px;border:1px solid #FFD0D0">
+              <div style="font-weight:700;font-size:.9rem;color:var(--danger);margin-bottom:4px">Sair de todos os dispositivos</div>
+              <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:10px">Encerra todas as sessões ativas da sua conta.</div>
+              <button class="btn btn-danger btn-sm" onclick="showToast('Sessões encerradas.','danger')">Sair de todos</button>
+            </div>
+            <div style="padding:14px;background:#FFF0F0;border-radius:10px;border:1px solid #FFD0D0">
+              <div style="font-weight:700;font-size:.9rem;color:var(--danger);margin-bottom:4px">Sair da família</div>
+              <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:10px">Você perderá acesso a todos os dados da família.</div>
+              <button class="btn btn-danger btn-sm" onclick="leaveFamily()">Sair da família</button>
+            </div>
+            <div style="padding:14px;background:#FFF0F0;border-radius:10px;border:1px solid #FFD0D0">
+              <div style="font-weight:700;font-size:.9rem;color:var(--danger);margin-bottom:4px">Excluir conta</div>
+              <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:10px">Esta ação é irreversível. Todos os seus dados serão apagados.</div>
+              <button class="btn btn-danger btn-sm" onclick="deleteAccount()">Excluir minha conta</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/layout.js"></script>
+<script>
+const familyMembers = [
+  { id:1, nome:'Rafaela Parrilla',  iniciais:'RP', papel:'admin',  cor:'var(--primary)',  eu:true  },
+  { id:2, nome:'Andressa Parrilla', iniciais:'AP', papel:'membro', cor:'var(--secondary)',  eu:false },
+  { id:3, nome:'Isabelli Parrilla', iniciais:'IS', papel:'membro', cor:'var(--accent)',   eu:false },
+  { id:4, nome:'Gustavo Parrilla',   iniciais:'GP', papel:'membro', cor:'var(--warning)',   eu:false },
+  { id:5, nome:'Rafael Parrilla',   iniciais:'RP', papel:'membro', cor:'var(--warning)', eu:false },
+];
+
+function renderMembers() {
+  document.getElementById('members-list').innerHTML = familyMembers.map(m =>
+    `<div class="member-card">
+      <div style="width:44px;height:44px;border-radius:50%;background:${m.cor};display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:800;color:#fff;flex-shrink:0">${m.iniciais}</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:.92rem">${m.nome}${m.eu?' <span style="color:var(--primary);font-size:.75rem">(você)</span>':''}</div>
+        <div style="font-size:.78rem;color:var(--text-muted)">${m.papel === 'admin' ? '👑 Administrador' : '👤 Membro'} · ${m.pts} pts</div>
+      </div>
+      ${!m.eu ? `<button class="btn btn-danger btn-sm btn-icon" onclick="removeMember(${m.id})" title="Remover">✕</button>` : ''}
+    </div>`
+  ).join('');
+}
+
+function switchTab(tab) {
+  ['visao','editar','familia','seguranca'].forEach(t => {
+    document.getElementById(`tab-${t}`).style.display = t === tab ? '' : 'none';
+    document.getElementById(`tab-btn-${t}`).classList.toggle('active', t === tab);
+  });
+  if (tab === 'familia') renderMembers();
+}
+
+function saveProfile() {
+  const nome = document.getElementById('edit-nome').value.trim();
+  if (!nome) { showToast('Informe seu nome.', 'warning'); return; }
+  document.getElementById('profile-name-display').textContent = nome;
+  document.getElementById('sb-user-name').textContent = nome;
+  const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+  user.nome = nome;
+  sessionStorage.setItem('user', JSON.stringify(user));
+  showToast('Perfil atualizado com sucesso!', 'success');
+}
+
+function selectAvatar(emoji, el) {
+  document.querySelectorAll('.avatar-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('avatar-preview').textContent = emoji;
+  document.getElementById('profile-avatar-display').textContent = emoji;
+  document.getElementById('sb-avatar').textContent = emoji;
+}
+
+function selectColor(color, el) {
+  document.querySelectorAll('.avatar-picker + .form-group div div').forEach(d => d.style.border = 'none');
+  el.style.border = `3px solid ${color}`;
+  document.getElementById('profile-avatar-display').style.background = color;
+}
+
+function copyCode() {
+  navigator.clipboard.writeText('PARRILLA2026').then(() => {
+    showToast('Código copiado!', 'success');
+  }).catch(() => {
+    showToast('Código: PARRILLA2026', 'info');
+  });
+}
+
+function sendInvite() {
+  const email = document.getElementById('invite-email').value.trim();
+  if (!email) { showToast('Informe o e-mail.', 'warning'); return; }
+  document.getElementById('invite-email').value = '';
+  showToast(`Convite enviado para ${email}!`, 'success');
+}
+
+function removeMember(id) {
+  if (!confirm('Remover este membro da família?')) return;
+  showToast('Membro removido.', 'danger');
+  renderMembers();
+}
+
+function changePassword() {
+  const np = document.getElementById('new-pass').value;
+  const cp = document.getElementById('confirm-pass').value;
+  if (!np || !cp) { showToast('Preencha os campos de senha.', 'warning'); return; }
+  if (np !== cp)  { showToast('As senhas não coincidem.', 'warning'); return; }
+  if (np.length < 6) { showToast('Senha muito curta.', 'warning'); return; }
+  showToast('Senha alterada com sucesso!', 'success');
+  document.getElementById('new-pass').value    = '';
+  document.getElementById('confirm-pass').value= '';
+}
+
+function leaveFamily() {
+  if (confirm('Tem certeza que deseja sair da família? Você perderá acesso a todos os dados.')) {
+    showToast('Você saiu da família.', 'danger');
+    setTimeout(() => { window.location.href = '../index.html'; }, 1500);
+  }
+}
+
+function deleteAccount() {
+  if (confirm('ATENÇÃO: Esta ação é irreversível! Deseja realmente excluir sua conta?')) {
+    showToast('Conta excluída.', 'danger');
+    setTimeout(() => { sessionStorage.clear(); window.location.href = '../index.html'; }, 1500);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+  if (user.nome) {
+    document.getElementById('profile-name-display').textContent = user.nome;
+    document.getElementById('edit-nome').value = user.nome;
+    const initials = user.nome.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase();
+    document.getElementById('profile-avatar-display').textContent = initials;
+    document.getElementById('avatar-preview').textContent = initials;
+  }
+  if (user.email) {
+    document.getElementById('profile-email-display').textContent = user.email;
+    document.getElementById('edit-email').value = user.email;
+  }
+});
+</script>
+</body>
+</html>

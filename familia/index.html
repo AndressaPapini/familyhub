@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FamilyHub — Login</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    body { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="login-page">
+  <div class="login-left">
+    <div class="login-left-content">
+      <span class="big-icon">🏡</span>
+      <h1>FamilyHub</h1>
+      <p>Organize sua família de forma simples, divertida e colaborativa. Agenda, finanças, compras e muito mais em um só lugar.</p>
+
+      <div class="login-features">
+        <div class="login-feature-item">
+          <div class="feat-icon">📅</div>
+          <span>Agenda compartilhada para toda a família</span>
+        </div>
+        <div class="login-feature-item">
+          <div class="feat-icon">💰</div>
+          <span>Controle financeiro em tempo real</span>
+        </div>
+        <div class="login-feature-item">
+          <div class="feat-icon">🛒</div>
+          <span>Lista de compras colaborativa</span>
+        </div>
+        <div class="login-feature-item">
+          <div class="feat-icon">🏆</div>
+          <span>Ranking e missões para engajar todos</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="login-right">
+    <div class="login-box">
+      <div class="login-logo">
+        <div class="logo-icon">🏡</div>
+        <div class="logo-text">Family<span style="color:var(--primary)">Hub</span></div>
+      </div>
+
+      <div class="login-tabs">
+        <button class="login-tab active" onclick="switchTab('login')">Entrar</button>
+        <button class="login-tab" onclick="switchTab('register')">Criar conta</button>
+      </div>
+
+      <div id="form-login">
+        <h2>Bem-vindo de volta!</h2>
+        <p class="login-sub">Acesse sua conta familiar</p>
+
+        <form id="loginForm" onsubmit="doLogin(event)">
+          <div class="form-group">
+            <label class="form-label">E-mail</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">✉️</span>
+              <input type="email" class="form-control" id="login-email" placeholder="seu@email.com" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Senha</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">🔒</span>
+              <input type="password" class="form-control" id="login-senha" placeholder="••••••••" required>
+            </div>
+          </div>
+
+          <div class="login-remember">
+            <label><input type="checkbox"> Lembrar de mim</label>
+            <a href="#">Esqueci a senha</a>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-full btn-lg" id="loginBtn">
+            <span>Entrar</span>
+          </button>
+        </form>
+
+        <div class="login-divider">ou acesse com demo</div>
+        <button class="btn btn-outline w-full" onclick="fillDemo()">
+          👤 Usar conta de demonstração
+        </button>
+      </div>
+
+      <div id="form-register" style="display:none">
+        <h2>Criar conta</h2>
+        <p class="login-sub">Junte-se à sua família no app</p>
+        <form id="registerForm" onsubmit="doRegister(event)">
+          <div class="form-group">
+            <label class="form-label">Nome completo</label>
+            <input type="text" class="form-control" id="reg-nome" placeholder="Seu nome" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">E-mail</label>
+            <input type="email" class="form-control" id="reg-email" placeholder="seu@email.com" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><input type="password" class="form-control" id="reg-senha" placeholder="Senha" required></div>
+            <div class="form-group"><input type="password" class="form-control" id="reg-confirma" placeholder="Confirmar" required></div>
+          </div>
+          <button type="submit" class="btn btn-primary w-full">Criar conta</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+
+<script src="assets/js/app.js"></script>
+<script>
+  function switchTab(tab) {
+    document.querySelectorAll('.login-tab').forEach((t, i) => {
+      t.classList.toggle('active', (tab === 'login' ? i === 0 : i === 1));
+    });
+    document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none';
+    document.getElementById('form-register').style.display = tab === 'register' ? '' : 'none';
+  }
+
+  function fillDemo() {
+    document.getElementById('login-email').value = 'rafaela.parrilla@email.com';
+    document.getElementById('login-senha').value = '123456';
+    showToast('Dados de demonstração preenchidos!', 'info');
+  }
+
+  async function doLogin(e) {
+    e.preventDefault();
+    const btn = document.getElementById('loginBtn');
+    const email = document.getElementById('login-email').value;
+    const senha = document.getElementById('login-senha').value;
+
+    btn.disabled = true;
+    btn.innerHTML = '<span>Entrando...</span>';
+
+    try {
+      // Aqui seria a chamada real para api/auth.php
+      const response = await fetch('api/auth.php', { method: 'POST', body: new FormData(e.target) });
+      const data = await response.json();
+      
+      if (data.success) {
+        sessionStorage.setItem('user', JSON.stringify(data.user));
+        window.location.href = 'pages/dashboard.html';
+      } else {
+        throw new Error('Falha no login');
+      }
+    } catch (err) {
+      // MODO DEMO (Ativado se não houver backend ou falhar)
+      if (email && senha) {
+        // Extrai o nome do email (ex: joao.silva@email.com -> Joao Silva)
+        const userPart = email.split('@')[0];
+        const formattedName = userPart.split(/[._]/).map(word => 
+          word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
+
+        const userObj = {
+          nome: formattedName,
+          email: email,
+          papel: 'Administrador',
+          familia_nome: 'Família Parrilla',
+          pontos: 150
+        };
+
+        sessionStorage.setItem('user', JSON.stringify(userObj));
+        showToast('Login realizado (Modo Demo)!', 'success');
+        setTimeout(() => { window.location.href = 'pages/dashboard.html'; }, 800);
+      }
+    }
+  }
+
+  function doRegister(e) {
+    e.preventDefault();
+    showToast('Conta criada com sucesso! Faça login.', 'success');
+    setTimeout(() => switchTab('login'), 1500);
+  }
+</script>
+</body>
+</html>
