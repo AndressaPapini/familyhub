@@ -4,8 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FamíliaApp — Notificações</title>
+  
   <link rel="stylesheet" href="../assets/css/style.css">
+  
   <style>
+    /* ESTILOS DA PÁGINA DE NOTIFICAÇÕES */
+
+    /* Centraliza o bloco de notificações na tela e limita a largura para não distorcer em monitores ultrawide */
+    .notif-container-center {
+      max-width: 800px; 
+      margin: 0 auto;   
+    }
+
+    /* O "quadro" branco que envolve a lista inteira */
     .notif-card {
       background: var(--card-bg);
       border-radius: var(--radius);
@@ -13,34 +24,52 @@
       padding: 0 22px;
       box-shadow: var(--shadow-sm);
     }
+
+    /* Linha individual de cada notificação */
     .notif-full-item {
-      display: flex;
-      gap: 16px;
+      display: flex; /* Flexbox permite colocar o ícone, texto e botão na mesma linha facilmente */
+      gap: 16px; /* Espaço entre as colunas da linha */
       padding: 18px 0;
-      border-bottom: 1px solid var(--border);
-      transition: background var(--transition);
+      border-bottom: 1px solid var(--border); /* Linha separadora entre itens */
+      transition: background var(--transition); /* Efeito suave ao passar o mouse */
       cursor: pointer;
     }
+    
+    /* Remove a linha divisória do último item para ficar com acabamento limpo */
     .notif-full-item:last-child { border-bottom: none; }
+
+    /* Estilo especial apenas para notificações NÃO LIDAS */
     .notif-full-item.unread {
       background: var(--primary-light);
-      margin: 0 -22px;
-      padding: 18px 22px;
+      margin: 0 -22px; /* Margem negativa faz o fundo colorido encostar nas bordas laterais do card */
+      padding: 18px 22px; /* Compensa a margem negativa devolvendo o espaçamento interno do texto */
     }
+
+    /* Efeitos de Hover (quando o mouse passa por cima) */
     .notif-full-item:hover { background: var(--bg); }
     .notif-full-item.unread:hover { background: #dde0ff; }
+
+    /* Bolinha onde fica o emoji/ícone */
     .notif-icon-circle {
       width: 46px; height: 46px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; /* 50% transforma um quadrado num círculo perfeito */
+      display: flex; align-items: center; justify-content: center; /* Centraliza o emoji */
       font-size: 1.1rem;
-      flex-shrink: 0;
+      flex-shrink: 0; /* Impede que o círculo fique oval/espremido em telas pequenas */
     }
+
+    /* Área do meio onde ficam os textos (Toma o espaço que sobrar) */
     .notif-content { flex: 1; }
+    
+    /* Textos internos da notificação */
     .notif-title-full { font-size: .92rem; font-weight: 700; }
     .notif-msg-full   { font-size: .83rem; color: var(--text-muted); margin-top: 3px; line-height: 1.5; }
     .notif-time-full  { font-size: .75rem; color: var(--text-muted); margin-top: 6px; }
+    
+    /* Área da direita onde ficam a bolinha azul e o botão de excluir */
     .notif-actions    { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    
+    /* Pontinho azul indicando notificação nova */
     .unread-dot {
       width: 9px; height: 9px;
       border-radius: 50%;
@@ -48,9 +77,11 @@
       flex-shrink: 0;
       margin-top: 6px;
     }
+
+    /* Botões ovais de filtro (Todas, Não lidas, etc.) */
     .notif-type-tab {
       padding: 7px 16px;
-      border-radius: 99px;
+      border-radius: 99px; /* Arredonda as laterais formando uma "pílula" */
       font-size: .82rem;
       font-weight: 600;
       border: 1.5px solid var(--border);
@@ -59,49 +90,17 @@
       cursor: pointer;
       transition: all var(--transition);
     }
+    
+    /* Cor do botão de filtro quando está selecionado */
     .notif-type-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-    .settings-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .settings-row:last-child { border-bottom: none; }
-    .toggle-switch {
-      position: relative;
-      width: 44px; height: 24px;
-    }
-    .toggle-switch input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider {
-      position: absolute;
-      inset: 0;
-      background: var(--border);
-      border-radius: 99px;
-      cursor: pointer;
-      transition: .3s;
-    }
-    .toggle-slider::before {
-      content: '';
-      position: absolute;
-      width: 18px; height: 18px;
-      border-radius: 50%;
-      background: #fff;
-      left: 3px; top: 3px;
-      transition: .3s;
-      box-shadow: 0 1px 4px rgba(0,0,0,.2);
-    }
-    .toggle-switch input:checked + .toggle-slider { background: var(--primary); }
-    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
   </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-icon">🏡</div>
-    <div class="logo-text">Família<span>App</span></div>
+    <div class="logo-text">Family<span>Hub</span></div>
   </div>
   <div class="sidebar-family">
     <div class="family-label">Família</div>
@@ -118,13 +117,13 @@
     <a href="ranking.html"      class="nav-item"><span class="nav-icon">🏆</span> Ranking</a>
     <a href="notificacoes.html" class="nav-item active"><span class="nav-icon">🔔</span> Notificações</a>
     <div class="nav-section-label">Conta</div>
-    <a href="perfil.html" class="nav-item"><span class="nav-icon">👤</span> Meu Perfil</a>
+    <a href="perfil.html" class="nav-item"><span class="nav-icon">👤</span>Meu Perfil</a>
   </nav>
   <div class="sidebar-footer">
     <div class="sidebar-user">
-      <div class="user-avatar" id="sb-avatar">JS</div>
+      <div class="user-avatar" id="sb-avatar">RP</div>
       <div class="user-info">
-        <div class="user-name" id="sb-user-name">João Silva</div>
+        <div class="user-name" id="sb-user-name">Rafaela Parrilla</div>
         <div class="user-role">Administrador</div>
       </div>
       <button class="logout-btn" onclick="doLogout()" title="Sair">🚪</button>
@@ -132,7 +131,6 @@
   </div>
 </aside>
 
-<!-- MAIN -->
 <div class="main-wrapper">
   <header class="topbar">
     <div class="topbar-title">Notificações</div>
@@ -142,56 +140,52 @@
   </header>
 
   <main class="page-content">
+    <div class="notif-container-center">
+      
+      <div class="page-header">
+        <div>
+          <h1>🔔 Notificações</h1>
+          <p>Fique por dentro de tudo que acontece na família</p>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-outline" onclick="markAllRead()">✅ Marcar todas como lidas</button>
+          <button class="btn btn-danger" onclick="clearAll()">🗑️ Limpar todas</button>
+        </div>
+      </div>
 
-    <div class="page-header">
+      <div class="stats-grid mb-24">
+        <div class="stat-card">
+          <div class="stat-icon purple">🔔</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-total">5</div>
+            <div class="stat-label">Total</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon pink">🔴</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-unread">3</div>
+            <div class="stat-label">Não lidas</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">✅</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-read">2</div>
+            <div class="stat-label">Lidas</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon orange">⚠️</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-warn">1</div>
+            <div class="stat-label">Avisos</div>
+          </div>
+        </div>
+      </div>
+
       <div>
-        <h1>🔔 Notificações</h1>
-        <p>Fique por dentro de tudo que acontece na família</p>
-      </div>
-      <div style="display:flex;gap:10px">
-        <button class="btn btn-outline" onclick="markAllRead()">✅ Marcar todas como lidas</button>
-        <button class="btn btn-danger" onclick="clearAll()">🗑️ Limpar todas</button>
-      </div>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-grid mb-24">
-      <div class="stat-card">
-        <div class="stat-icon purple">🔔</div>
-        <div class="stat-info">
-          <div class="stat-value" id="stat-total">5</div>
-          <div class="stat-label">Total de notificações</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon pink">🔴</div>
-        <div class="stat-info">
-          <div class="stat-value" id="stat-unread">3</div>
-          <div class="stat-label">Não lidas</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon green">✅</div>
-        <div class="stat-info">
-          <div class="stat-value" id="stat-read">2</div>
-          <div class="stat-label">Já lidas</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon orange">⚠️</div>
-        <div class="stat-info">
-          <div class="stat-value" id="stat-warn">1</div>
-          <div class="stat-label">Avisos importantes</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="grid-2-1">
-
-      <!-- Lista de notificações -->
-      <div>
-        <!-- Filtros -->
-        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;justify-content: center;">
           <button class="notif-type-tab active" onclick="filterNotifs('todas', this)">Todas</button>
           <button class="notif-type-tab" onclick="filterNotifs('nao-lidas', this)">🔴 Não lidas</button>
           <button class="notif-type-tab" onclick="filterNotifs('info', this)">💬 Informações</button>
@@ -200,90 +194,33 @@
         </div>
 
         <div class="notif-card" id="notif-list">
-          <!-- Gerado via JS -->
         </div>
       </div>
 
-      <!-- Painel lateral -->
-      <div style="display:flex;flex-direction:column;gap:16px">
-
-        <!-- Configurações de notificação -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">⚙️ Configurações</div>
-          </div>
-          <div class="settings-row">
-            <div>
-              <div style="font-size:.88rem;font-weight:600">Eventos da agenda</div>
-              <div style="font-size:.78rem;color:var(--text-muted)">Lembretes de compromissos</div>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" checked>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="settings-row">
-            <div>
-              <div style="font-size:.88rem;font-weight:600">Lista de compras</div>
-              <div style="font-size:.78rem;color:var(--text-muted)">Itens adicionados/comprados</div>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" checked>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="settings-row">
-            <div>
-              <div style="font-size:.88rem;font-weight:600">Missões concluídas</div>
-              <div style="font-size:.78rem;color:var(--text-muted)">Pontos ganhos no ranking</div>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" checked>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="settings-row">
-            <div>
-              <div style="font-size:.88rem;font-weight:600">Alertas financeiros</div>
-              <div style="font-size:.78rem;color:var(--text-muted)">Metas e gastos</div>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" checked>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="settings-row">
-            <div>
-              <div style="font-size:.88rem;font-weight:600">Aniversários</div>
-              <div style="font-size:.78rem;color:var(--text-muted)">Lembretes com 7 dias de antecedência</div>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" checked>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
-
+    </div> 
   </main>
 </div>
 
 <div id="toast-container" class="toast-container"></div>
 <script src="../assets/js/app.js"></script>
 <script src="../assets/js/layout.js"></script>
+
 <script>
+// 1. BANCO DE DADOS SIMULADO 
+// Um array de objetos, onde cada objeto representa as informações de uma notificação.
 let notifications = [
   { id:1, titulo:'Aniversário se aproxima!',   msg:'O aniversário da Rafaela é em 11 dias. Comece a planejar!', tipo:'aviso',  icone:'🎂', lida:false, tempo:'2h atrás'   },
   { id:2, titulo:'Meta atingida!',              msg:'Vocês pouparam R$ 3.200 para a viagem de férias! 🎉',    tipo:'sucesso',icone:'🎉', lida:false, tempo:'5h atrás'   },
-  { id:3, titulo:'Nova missão disponível',      msg:'"Semana sem delivery" foi adicionada às missões.',       tipo:'info',   icone:'⭐', lida:false, tempo:'1d atrás'   },
+  { id:3, titulo:'Nova missão disponível',      msg:'"Semana sem delivery" foi adicionada às missões.',        tipo:'info',   icone:'⭐', lida:false, tempo:'1d atrás'   },
   { id:4, titulo:'Lista de compras atualizada', msg:'Isabelli adicionou 3 itens à lista "Compras da semana".',    tipo:'info',   icone:'🛒', lida:true,  tempo:'1d atrás'   },
   { id:5, titulo:'Parabéns!',                   msg:'Você completou a missão "Leitura em família"! +20 pts', tipo:'sucesso',icone:'🏆', lida:true,  tempo:'2d atrás'   },
 ];
 
+// Variável que guarda qual aba de filtro o usuário selecionou no momento
 let notifFilter = 'todas';
 let nextNotifId = 6;
 
+// Dicionário de estilos: Relaciona o tipo da notificação a uma cor e um texto (tag)
 const TYPE_STYLES = {
   info:    { bg:'#EEF0FF', color:'var(--primary)',   label:'Info'    },
   sucesso: { bg:'#EDFAF4', color:'var(--success)',   label:'Sucesso' },
@@ -291,99 +228,117 @@ const TYPE_STYLES = {
   erro:    { bg:'#FFF0F0', color:'var(--danger)',    label:'Erro'    },
 };
 
+// 2. FUNÇÃO PRINCIPAL DE RENDERIZAÇÃO
+// Esta função lê o array, cria os blocos em HTML e injeta na tela.
 function renderNotifs() {
+  // Faz uma cópia da lista original para podermos filtrar sem perder dados
   let filtered = notifications;
-  if (notifFilter === 'nao-lidas') filtered = notifications.filter(n => !n.lida);
-  else if (notifFilter !== 'todas') filtered = notifications.filter(n => n.tipo === notifFilter);
-
-  updateStats();
-
-  if (!filtered.length) {
-    document.getElementById('notif-list').innerHTML =
-      '<div class="empty-state"><div class="empty-icon">🔔</div><p>Nenhuma notificação.</p></div>';
-    return;
+  
+  // Aplica a regra de filtragem dependendo de qual aba está ativa
+  if (notifFilter === 'nao-lidas') {
+    filtered = notifications.filter(n => !n.lida);
+  } else if (notifFilter !== 'todas') {
+    filtered = notifications.filter(n => n.tipo === notifFilter);
   }
 
+  // Atualiza os contadores coloridos lá no topo
+  updateStats();
+
+  // Caso não sobre nenhuma notificação após o filtro, mostra a mensagem vazia
+  if (!filtered.length) {
+    document.getElementById('notif-list').innerHTML =
+      '<div class="empty-state" style="padding:40px; text-align:center;"><div class="empty-icon" style="font-size:3rem">🔔</div><p>Nenhuma notificação encontrada.</p></div>';
+    return; // Para a execução da função aqui
+  }
+
+  // O `.map` percorre o array e converte cada objeto num bloco de código HTML
   document.getElementById('notif-list').innerHTML = filtered.map(n => {
+    
+    // Puxa as cores lá do dicionário baseado no tipo (ex: 'aviso' = amarelo)
     const style = TYPE_STYLES[n.tipo] || TYPE_STYLES.info;
+    
+    // O bloco HTML com a injeção das variáveis (${n.variavel})
     return `<div class="notif-full-item${!n.lida?' unread':''}" onclick="markRead(${n.id})">
       <div class="notif-icon-circle" style="background:${style.bg};color:${style.color}">${n.icone}</div>
       <div class="notif-content">
         <div class="notif-title-full">${n.titulo}</div>
         <div class="notif-msg-full">${n.msg}</div>
         <div class="notif-time-full">
-          <span class="badge" style="background:${style.bg};color:${style.color}">${style.label}</span>
+          <span class="badge" style="background:${style.bg};color:${style.color}; padding: 2px 8px; border-radius:4px; font-size:10px">${style.label}</span>
           &nbsp;${n.tempo}
         </div>
       </div>
       <div class="notif-actions">
         ${!n.lida ? '<div class="unread-dot"></div>' : ''}
+        
         <button class="btn btn-danger btn-sm btn-icon" onclick="event.stopPropagation();deleteNotif(${n.id})" title="Excluir">✕</button>
       </div>
     </div>`;
-  }).join('');
+  }).join(''); // O '.join' pega a lista de HTMLs separados e gruda num texto único.
 }
 
+// 3. FUNÇÃO QUE ATUALIZA OS CONTADORES (CARDS DO TOPO)
 function updateStats() {
   const total  = notifications.length;
   const unread = notifications.filter(n => !n.lida).length;
   const read   = total - unread;
   const warn   = notifications.filter(n => n.tipo === 'aviso').length;
+  
+  // Altera os textos (textContent) das divs com base nos cálculos acima
   document.getElementById('stat-total').textContent  = total;
   document.getElementById('stat-unread').textContent = unread;
   document.getElementById('stat-read').textContent   = read;
   document.getElementById('stat-warn').textContent   = warn;
 }
 
+// 4. FUNÇÕES DE INTERAÇÃO DO USUÁRIO
+
+// Marca um card específico como lido
 function markRead(id) {
+  // Procura o id exato dentro do array
   const n = notifications.find(n => n.id === id);
-  if (n && !n.lida) { n.lida = true; renderNotifs(); }
+  if (n && !n.lida) { 
+    n.lida = true; // Modifica o status para lido
+    renderNotifs(); // Manda desenhar a tela de novo atualizada
+  }
 }
 
+// Marca todas as notificações do banco de dados como lidas de uma vez
 function markAllRead() {
   notifications.forEach(n => n.lida = true);
-  showToast('Todas as notificações marcadas como lidas.', 'success');
   renderNotifs();
 }
 
+// Apaga um item clicando no (X)
 function deleteNotif(id) {
+  // Substitui a lista inteira por ela mesma, porém filtrando (removendo) o ID selecionado
   notifications = notifications.filter(n => n.id !== id);
   renderNotifs();
-  showToast('Notificação removida.', 'info');
 }
 
+// Apaga toda a caixa de notificações
 function clearAll() {
   if (!confirm('Limpar todas as notificações?')) return;
-  notifications = [];
+  notifications = []; // Esvazia o Array inteiro
   renderNotifs();
-  showToast('Notificações limpas.', 'info');
 }
 
+// Quando o usuário clica nas abas ("Todas", "Não Lidas", etc)
 function filterNotifs(filter, btn) {
-  notifFilter = filter;
+  notifFilter = filter; // Atualiza a variável global
+  
+  // Remove a cor escura (active) de todos os botões de abas
   document.querySelectorAll('.notif-type-tab').forEach(b => b.classList.remove('active'));
+  
+  // Adiciona a cor escura apenas na aba que o usuário acabou de clicar
   btn.classList.add('active');
+  
+  // Manda redesenhar a lista filtrada
   renderNotifs();
 }
 
-function sendNotif() {
-  const titulo = document.getElementById('new-notif-title').value.trim();
-  const msg    = document.getElementById('new-notif-msg').value.trim();
-  const tipo   = document.getElementById('new-notif-tipo').value;
-  if (!titulo || !msg) { showToast('Preencha título e mensagem.', 'warning'); return; }
-
-  const icons = { info:'💬', aviso:'⚠️', sucesso:'✅' };
-  notifications.unshift({
-    id: nextNotifId++, titulo, msg, tipo,
-    icone: icons[tipo] || '🔔',
-    lida: false, tempo: 'agora mesmo'
-  });
-  document.getElementById('new-notif-title').value = '';
-  document.getElementById('new-notif-msg').value   = '';
-  showToast('Aviso enviado para a família!', 'success');
-  renderNotifs();
-}
-
+// EVENTO INICIAL
+// Quando a página acabar de carregar completamente o HTML, ele executa a função pela 1ª vez.
 document.addEventListener('DOMContentLoaded', renderNotifs);
 </script>
 </body>

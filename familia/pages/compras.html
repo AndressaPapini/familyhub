@@ -4,8 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FamíliaApp — Compras</title>
+  
   <link rel="stylesheet" href="../assets/css/style.css">
+  
   <style>
+    /* =========================================
+       ESTILOS ESPECÍFICOS DA PÁGINA DE COMPRAS
+       ========================================= */
+
+    /* Estilo das abas horizontais de listas (Ex: "Compras da semana", "Festa") */
     .list-tab {
       padding: 10px 20px;
       border-radius: var(--radius-sm);
@@ -20,11 +27,14 @@
       align-items: center;
       gap: 8px;
     }
+    /* Como a aba fica quando está selecionada (ativa) */
     .list-tab.active {
       background: var(--primary);
       color: #fff;
       border-color: var(--primary);
     }
+
+    /* Estilo da linha de cada item da lista (Ex: "1kg de Arroz") */
     .item-row {
       display: flex;
       align-items: center;
@@ -32,11 +42,15 @@
       padding: 12px 0;
       border-bottom: 1px solid var(--border);
     }
-    .item-row:last-child { border-bottom: none; }
+    .item-row:last-child { border-bottom: none; } /* Remove a borda do último item para não sobrar espaço */
+    
+    /* Quando o item foi comprado, o nome fica riscado e mais opaco */
     .item-row.bought .item-name {
       text-decoration: line-through;
       color: var(--text-muted);
     }
+
+    /* O quadradinho de check (checkbox customizado) */
     .item-check {
       width: 22px; height: 22px;
       border-radius: 6px;
@@ -46,14 +60,19 @@
       flex-shrink: 0;
       transition: all var(--transition);
     }
+    /* Estilo do check quando está marcado */
     .item-check.checked {
       background: var(--success);
       border-color: var(--success);
       color: #fff;
     }
+
+    /* Tipografia interna dos itens da lista */
     .item-name { flex: 1; font-size: .9rem; font-weight: 500; }
     .item-qty  { font-size: .82rem; color: var(--text-muted); min-width: 60px; }
     .item-price { font-size: .85rem; font-weight: 600; color: var(--text); min-width: 70px; text-align: right; }
+
+    /* Etiqueta colorida da Categoria do produto (Ex: Grãos, Limpeza) */
     .cat-chip {
       padding: 3px 10px;
       border-radius: 99px;
@@ -62,8 +81,10 @@
       background: var(--bg);
       color: var(--text-muted);
     }
+
+    /* Barra principal de resumo (Total, Pendentes, Valor) no topo */
     .summary-bar {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      background: linear-gradient(135deg, var(--primary), var(--secondary)); /* Fundo em degradê com as cores do projeto */
       border-radius: var(--radius);
       padding: 20px 24px;
       color: #fff;
@@ -72,15 +93,16 @@
       gap: 24px;
       margin-bottom: 24px;
     }
+    
+    /* Textos e divisórias dentro da barra de resumo */
     .summary-bar .s-item { text-align: center; }
     .summary-bar .s-val  { font-size: 1.4rem; font-weight: 800; }
     .summary-bar .s-lbl  { font-size: .78rem; opacity: .85; }
-    .summary-bar .s-div  { width: 1px; height: 40px; background: rgba(255,255,255,.3); }
+    .summary-bar .s-div  { width: 1px; height: 40px; background: rgba(255,255,255,.3); } /* Linha vertical separadora */
   </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-icon">🏡</div>
@@ -94,8 +116,7 @@
     <div class="nav-section-label">Principal</div>
     <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
     <a href="agenda.html"    class="nav-item"><span class="nav-icon">📅</span> Agenda</a>
-    <a href="compras.html"   class="nav-item active"><span class="nav-icon">🛒</span> Compras</a>
-    <a href="financas.html"  class="nav-item"><span class="nav-icon">💰</span> Finanças</a>
+    <a href="compras.html"   class="nav-item active"><span class="nav-icon">🛒</span> Compras</a> <a href="financas.html"  class="nav-item"><span class="nav-icon">💰</span> Finanças</a>
     <a href="missoes.html"   class="nav-item"><span class="nav-icon">⭐</span> Missões</a>
     <div class="nav-section-label">Comunidade</div>
     <a href="ranking.html"      class="nav-item"><span class="nav-icon">🏆</span> Ranking</a>
@@ -115,8 +136,8 @@
   </div>
 </aside>
 
-<!-- MAIN -->
 <div class="main-wrapper">
+  
   <header class="topbar">
     <div class="topbar-title">Lista de Compras</div>
     <div class="topbar-search">
@@ -140,7 +161,6 @@
       </div>
     </div>
 
-    <!-- Summary bar -->
     <div class="summary-bar" id="summary-bar">
       <div class="s-item">
         <div class="s-val" id="sum-total">8</div>
@@ -161,8 +181,7 @@
         <div class="s-val" id="sum-value">R$ 124,08</div>
         <div class="s-lbl">Valor estimado</div>
       </div>
-      <div style="flex:1"></div>
-      <div>
+      <div style="flex:1"></div> <div>
         <div class="progress" style="width:160px;background:rgba(255,255,255,.3)">
           <div class="progress-bar" id="sum-progress" style="background:#fff;width:25%"></div>
         </div>
@@ -170,18 +189,15 @@
       </div>
     </div>
 
-    <!-- Listas tabs -->
     <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap" id="lists-tabs">
-      <!-- Gerado via JS -->
     </div>
 
-    <!-- Filtro por categoria -->
     <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap" id="cat-filters">
       <button class="filter-btn active" onclick="setCatFilter('todas', this)">Todas</button>
     </div>
 
-    <!-- Itens da lista -->
     <div class="grid-2-1">
+      
       <div class="card">
         <div class="card-header">
           <div>
@@ -196,33 +212,24 @@
         <div id="items-container"></div>
       </div>
 
-      <!-- Painel lateral -->
       <div style="display:flex;flex-direction:column;gap:16px">
 
-        <!-- Resumo por categoria -->
         <div class="card">
           <div class="card-header">
             <div class="card-title">📊 Por Categoria</div>
           </div>
-          <div id="cat-summary"></div>
-        </div>
+          <div id="cat-summary"></div> </div>
 
-
-        <!-- Histórico de listas -->
         <div class="card">
           <div class="card-header">
             <div class="card-title">📋 Minhas Listas</div>
             <button class="btn btn-secondary btn-sm" onclick="openModal('modal-nova-lista')">+ Nova</button>
           </div>
-          <div id="lists-sidebar"></div>
-        </div>
+          <div id="lists-sidebar"></div> </div>
       </div>
-    </div>
-
-  </main>
+    </div> </main>
 </div>
 
-<!-- Modal nova lista -->
 <div class="modal-overlay" id="modal-nova-lista">
   <div class="modal">
     <div class="modal-header">
@@ -240,7 +247,6 @@
   </div>
 </div>
 
-<!-- Modal adicionar item -->
 <div class="modal-overlay" id="modal-add-item">
   <div class="modal">
     <div class="modal-header">
@@ -286,10 +292,12 @@
 </div>
 
 <div id="toast-container" class="toast-container"></div>
+
 <script src="../assets/js/app.js"></script>
 <script src="../assets/js/layout.js"></script>
+
 <script>
-// ── Dados ──────────────────────────────────────────────────
+// ── 1. BANCO DE DADOS SIMULADO E ESTADOS ──────────────────
 let lists = [
   { id:1, nome:'Compras da semana', ativa:true  },
   { id:2, nome:'Festa da Merlotto',    ativa:false },
@@ -306,18 +314,21 @@ let items = [
   { id:8, lista:2, nome:'Salgadinhos',  qty:200, un:'g',   cat:'Snacks',     preco:12.00, bought:false },
 ];
 
-let activeListId = 1;
-let catFilter    = 'todas';
-let nextItemId   = 9;
-let nextListId   = 3;
+let activeListId = 1;      // Diz qual lista está aberta na tela agora
+let catFilter    = 'todas'; // Filtro atual de categorias
+let nextItemId   = 9;      // ID para o próximo item criado
+let nextListId   = 3;      // ID para a próxima lista criada
 
+// Dicionário de cores para as categorias, para ficar visualmente bonito nas tags e barras de progresso
 const CAT_COLORS = {
   'Grãos':'#6C63FF','Laticínios':'#43C6AC','Carnes':'#FF5C5C','Padaria':'#FFB347',
   'Bebidas':'#9B59B6','Snacks':'#FF6584','Confeitaria':'#FF6584','Higiene':'#43C6AC',
   'Limpeza':'#6C63FF','Outros':'#8A94A6'
 };
 
-// ── Render ─────────────────────────────────────────────────
+// ── 2. FUNÇÕES DE RENDERIZAÇÃO (DESENHO DA TELA) ──────────
+
+// Função mestre: chama todas as outras para remontar a tela inteira
 function render() {
   renderTabs();
   renderCatFilters();
@@ -327,6 +338,7 @@ function render() {
   renderSidebar();
 }
 
+// Desenha as abas horizontais (as listas disponíveis)
 function renderTabs() {
   document.getElementById('lists-tabs').innerHTML = lists.map(l =>
     `<button class="list-tab${l.id===activeListId?' active':''}" onclick="switchList(${l.id})">
@@ -335,39 +347,47 @@ function renderTabs() {
   ).join('');
 }
 
+// Cria os botões de filtro de categorias APENAS com categorias que existem na lista atual
 function renderCatFilters() {
   const activeItems = items.filter(i => i.lista === activeListId);
-  const cats = ['todas', ...new Set(activeItems.map(i => i.cat))];
+  // Pega categorias únicas usando Set
+  const cats = ['todas', ...new Set(activeItems.map(i => i.cat))]; 
+  
   document.getElementById('cat-filters').innerHTML = cats.map(c =>
     `<button class="filter-btn${c===catFilter?' active':''}" onclick="setCatFilter('${c}', this)">${c==='todas'?'Todas':c}</button>`
   ).join('');
 }
 
+// Desenha os itens da lista principal separados por "Pendentes" e "Comprados"
 function renderItems() {
   const list = lists.find(l => l.id === activeListId);
   document.getElementById('active-list-name').textContent = list ? list.nome : '';
 
+  // Filtra itens pela lista ativa e, se houver filtro de categoria ativo, filtra de novo
   let filtered = items.filter(i => i.lista === activeListId);
   if (catFilter !== 'todas') filtered = filtered.filter(i => i.cat === catFilter);
 
   const pending = filtered.filter(i => !i.bought).length;
   document.getElementById('active-list-sub').textContent = `${pending} item(ns) pendente(s)`;
 
+  // Se a lista estiver vazia, mostra estado vazio
   if (!filtered.length) {
     document.getElementById('items-container').innerHTML =
       '<div class="empty-state"><div class="empty-icon">🛒</div><p>Nenhum item nesta lista.</p></div>';
     return;
   }
 
-  // Separar pendentes e comprados
+  // Divide o array filtrado em dois: o que falta comprar e o que já foi comprado
   const pending_items = filtered.filter(i => !i.bought);
   const bought_items  = filtered.filter(i =>  i.bought);
 
   let html = '';
+  // Monta o bloco de Pendentes
   if (pending_items.length) {
     html += `<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;color:var(--text-muted);padding:8px 0 4px">Pendentes (${pending_items.length})</div>`;
     html += pending_items.map(i => itemRow(i)).join('');
   }
+  // Monta o bloco de Comprados
   if (bought_items.length) {
     html += `<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;color:var(--success);padding:16px 0 4px">Comprados (${bought_items.length})</div>`;
     html += bought_items.map(i => itemRow(i)).join('');
@@ -376,6 +396,7 @@ function renderItems() {
   document.getElementById('items-container').innerHTML = html;
 }
 
+// Retorna o HTML de um único item (usado na função acima)
 function itemRow(i) {
   const color = CAT_COLORS[i.cat] || '#8A94A6';
   return `<div class="item-row${i.bought?' bought':''}" id="item-row-${i.id}">
@@ -388,9 +409,12 @@ function itemRow(i) {
   </div>`;
 }
 
+// Calcula e desenha o bloco lateral "📊 Por Categoria" (As barrinhas de progresso coloridas)
 function renderCatSummary() {
   const activeItems = items.filter(i => i.lista === activeListId);
-  const cats = {};
+  const cats = {}; // Objeto vazio para agrupar as contagens
+  
+  // Passa por todos os itens contando quantos totais e comprados tem por categoria
   activeItems.forEach(i => {
     if (!cats[i.cat]) cats[i.cat] = { total:0, bought:0 };
     cats[i.cat].total++;
@@ -410,14 +434,17 @@ function renderCatSummary() {
   }).join('') || '<div class="text-muted" style="font-size:.85rem">Nenhum item.</div>';
 }
 
+// Atualiza a barra grande de resumo no topo (Total financeiro e progresso geral)
 function renderSummary() {
   const activeItems = items.filter(i => i.lista === activeListId);
   const total  = activeItems.length;
   const bought = activeItems.filter(i => i.bought).length;
   const pending= total - bought;
+  // Reduce multiplica preço pela quantidade para calcular o total estimado do carrinho
   const value  = activeItems.reduce((s, i) => s + (i.preco || 0) * i.qty, 0);
   const pct    = total ? Math.round((bought/total)*100) : 0;
 
+  // Injeta os dados no HTML
   document.getElementById('sum-total').textContent   = total;
   document.getElementById('sum-bought').textContent  = bought;
   document.getElementById('sum-pending').textContent = pending;
@@ -426,6 +453,7 @@ function renderSummary() {
   document.getElementById('sum-pct').textContent     = pct + '% concluído';
 }
 
+// Desenha a lista lateral "📋 Minhas Listas" com botões de excluir
 function renderSidebar() {
   document.getElementById('lists-sidebar').innerHTML = lists.map(l => {
     const count = items.filter(i => i.lista === l.id).length;
@@ -441,16 +469,19 @@ function renderSidebar() {
   }).join('') || '<div class="text-muted" style="font-size:.85rem">Nenhuma lista.</div>';
 }
 
-// ── Ações ──────────────────────────────────────────────────
+// ── 3. AÇÕES (BUSINESS LOGIC) ──────────────────────────────
+
+// Marca/Desmarca o checkbox de um item
 function toggleItem(id) {
   const item = items.find(i => i.id === id);
   if (item) {
-    item.bought = !item.bought;
+    item.bought = !item.bought; // Inverte o booleano (true vira false, false vira true)
     if (item.bought) showToast(`"${item.nome}" marcado como comprado! ✅`, 'success');
     render();
   }
 }
 
+// Deleta um item específico
 function removeItem(id) {
   const item = items.find(i => i.id === id);
   items = items.filter(i => i.id !== id);
@@ -458,9 +489,11 @@ function removeItem(id) {
   render();
 }
 
+// Pega os dados do formulário do modal e cria um novo item no banco
 function addItem() {
   const nome = document.getElementById('item-nome').value.trim();
   if (!nome) { showToast('Informe o nome do item.', 'warning'); return; }
+  
   items.push({
     id: nextItemId++,
     lista: activeListId,
@@ -471,6 +504,7 @@ function addItem() {
     preco: parseFloat(document.getElementById('item-preco').value) || 0,
     bought: false
   });
+  
   closeModal('modal-add-item');
   document.getElementById('item-nome').value = '';
   document.getElementById('item-preco').value = '';
@@ -478,6 +512,7 @@ function addItem() {
   render();
 }
 
+// Adição rápida (caso exista um input no topo não atrelado ao modal)
 function quickAdd() {
   const nome = document.getElementById('quick-item').value.trim();
   if (!nome) return;
@@ -487,12 +522,14 @@ function quickAdd() {
   render();
 }
 
+// Marca todos os itens pendentes da lista ATUAL como comprados de uma vez
 function markAllBought() {
   items.filter(i => i.lista === activeListId).forEach(i => i.bought = true);
   showToast('Todos os itens marcados como comprados!', 'success');
   render();
 }
 
+// Apaga da base de dados todos os itens da lista ATUAL que já estão marcados
 function clearBought() {
   const before = items.length;
   items = items.filter(i => !(i.lista === activeListId && i.bought));
@@ -501,6 +538,7 @@ function clearBought() {
   render();
 }
 
+// Cria uma nova aba de lista
 function createList() {
   const nome = document.getElementById('nova-lista-nome').value.trim();
   if (!nome) { showToast('Informe o nome da lista.', 'warning'); return; }
@@ -511,36 +549,45 @@ function createList() {
   render();
 }
 
+// Exclui uma lista inteira (e todos os itens que pertencem a ela)
 function removeList(id) {
   if (!confirm('Excluir esta lista e todos os seus itens?')) return;
   lists = lists.filter(l => l.id !== id);
   items = items.filter(i => i.lista !== id);
+  
+  // Se você excluiu a lista que estava aberta, muda a tela para a próxima lista disponível
   if (activeListId === id) activeListId = lists[0]?.id || null;
+  
   showToast('Lista excluída.', 'danger');
   render();
 }
 
+// Troca de aba entre listas diferentes
 function switchList(id) {
   activeListId = id;
-  catFilter = 'todas';
+  catFilter = 'todas'; // Reseta o filtro de categorias sempre que muda de lista
   render();
 }
 
+// Aplica a filtragem por categoria ao clicar nos botões pequenos
 function setCatFilter(cat, btn) {
   catFilter = cat;
+  // Remove a marcação escura de todos e adiciona no que acabou de ser clicado
   document.querySelectorAll('#cat-filters .filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderItems();
+  renderItems(); // Renderiza só os itens, não precisa renderizar a tela toda
 }
 
+// Busca em tempo real escondendo as divs via CSS (usado pela Topbar)
 function searchItems(q) {
   const term = q.toLowerCase();
   document.querySelectorAll('.item-row').forEach(row => {
     const name = row.querySelector('.item-name')?.textContent.toLowerCase() || '';
-    row.style.display = name.includes(term) ? '' : 'none';
+    row.style.display = name.includes(term) ? '' : 'none'; // Se não tiver a letra/palavra, some com o elemento
   });
 }
 
+// Executa o primeiro desenho geral assim que a página é carregada
 document.addEventListener('DOMContentLoaded', render);
 </script>
 </body>

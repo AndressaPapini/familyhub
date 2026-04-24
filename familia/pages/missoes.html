@@ -4,21 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FamíliaApp — Missões</title>
+  
   <link rel="stylesheet" href="../assets/css/style.css">
+  
   <style>
+   
+    /* Define que as missões ficarão em uma grade (grid) com 3 colunas de tamanhos iguais (1fr) */
     .mission-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    
+    /* Cartão individual de cada missão */
     .mission-full-card {
       background: var(--card-bg);
       border-radius: var(--radius);
       border: 1px solid var(--border);
       padding: 20px;
       box-shadow: var(--shadow-sm);
-      transition: all var(--transition);
-      position: relative;
-      overflow: hidden;
+      transition: all var(--transition); /* Suaviza a animação de hover */
+      position: relative; /* Necessário para posicionar a tag "Concluída" de forma absoluta dentro dele */
+      overflow: hidden; /* Corta qualquer elemento que vazar das bordas arredondadas */
     }
+    
+    /* Efeito ao passar o mouse: levanta o cartão (translateY) e aumenta a sombra */
     .mission-full-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+    
+    /* Quando a missão está concluída, o cartão fica um pouco transparente */
     .mission-full-card.done { opacity: .7; }
+    
+    /* Adiciona uma etiqueta de "✅ Concluída" no canto superior direito do cartão usando CSS (pseudo-elemento) */
     .mission-full-card.done::after {
       content: '✅ Concluída';
       position: absolute;
@@ -30,22 +42,34 @@
       padding: 3px 10px;
       border-radius: 99px;
     }
+
+    /* Cores das etiquetas de dificuldade (Fácil, Médio, Difícil) */
     .diff-badge.facil   { background:#EDFAF4; color:var(--success); }
     .diff-badge.medio   { background:#FFF6EC; color:var(--warning); }
     .diff-badge.dificil { background:#FFF0F0; color:var(--danger); }
+    
+    /* Base visual (formato de pílula) para a etiqueta de dificuldade */
     .diff-badge {
       display:inline-flex;align-items:center;
       padding:3px 10px;border-radius:99px;
       font-size:.72rem;font-weight:700;
     }
+
+    /* Etiqueta laranja vibrante que mostra quantos pontos a missão vale */
     .pts-badge {
-      background: linear-gradient(135deg, #FFB347, #FF8C00);
+      background: linear-gradient(135deg, #FFB347, #FF8C00); /* Efeito degradê laranja */
       color: #fff;
       padding: 4px 12px;
       border-radius: 99px;
       font-size: .8rem;
       font-weight: 800;
     }
+
+    /* =========================================
+       ESTILOS DO MINI RANKING LATERAL
+       ========================================= */
+       
+    /* Linha de cada usuário no ranking */
     .leaderboard-row {
       display: flex;
       align-items: center;
@@ -53,7 +77,9 @@
       padding: 12px 0;
       border-bottom: 1px solid var(--border);
     }
-    .leaderboard-row:last-child { border-bottom: none; }
+    .leaderboard-row:last-child { border-bottom: none; } /* Remove a linha do último item */
+    
+    /* Bolinha com o número da posição (1, 2, 3...) */
     .rank-num {
       width: 28px; height: 28px;
       border-radius: 50%;
@@ -62,17 +88,20 @@
       font-weight: 800;
       flex-shrink: 0;
     }
+    
+    /* Cores específicas para Ouro, Prata e Bronze */
     .rank-num.gold   { background: linear-gradient(135deg,#FFD700,#FFA500); color:#fff; }
     .rank-num.silver { background: linear-gradient(135deg,#C0C0C0,#A0A0A0); color:#fff; }
     .rank-num.bronze { background: linear-gradient(135deg,#CD7F32,#A0522D); color:#fff; }
     .rank-num.other  { background: var(--bg); color: var(--text-muted); }
+    
+    /* Barrinha de progresso do usuário no ranking */
     .xp-bar-wrap { flex:1; }
     .xp-label { display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:4px; }
   </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-icon">🏡</div>
@@ -88,10 +117,10 @@
     <a href="agenda.html"    class="nav-item"><span class="nav-icon">📅</span> Agenda</a>
     <a href="compras.html"   class="nav-item"><span class="nav-icon">🛒</span> Compras</a>
     <a href="financas.html"  class="nav-item"><span class="nav-icon">💰</span> Finanças</a>
-    <a href="missoes.html"   class="nav-item active"><span class="nav-icon">⭐</span> Missões</a>
-    <div class="nav-section-label">Comunidade</div>
+    <a href="missoes.html"   class="nav-item active"><span class="nav-icon">⭐</span> Missões</a> <div class="nav-section-label">Comunidade</div>
     <a href="ranking.html"      class="nav-item"><span class="nav-icon">🏆</span> Ranking</a>
     <a href="notificacoes.html" class="nav-item"><span class="nav-icon">🔔</span> Notificações <span class="nav-badge">3</span></a>
+    
     <div class="nav-section-label">Conta</div>
     <a href="perfil.html" class="nav-item"><span class="nav-icon">👤</span> Meu Perfil</a>
   </nav>
@@ -107,11 +136,9 @@
   </div>
 </aside>
 
-<!-- MAIN -->
 <div class="main-wrapper">
   <header class="topbar">
     <div class="topbar-title">Missões Familiares</div>
-
     <div class="topbar-actions">
       <a href="notificacoes.html" class="topbar-btn">🔔 <span class="badge">3</span></a>
       <a href="perfil.html" class="topbar-avatar" id="topbar-avatar">JS</a>
@@ -130,7 +157,6 @@
       </button>
     </div>
 
-    <!-- Stats -->
     <div class="stats-grid mb-24">
       <div class="stat-card">
         <div class="stat-icon purple">⭐</div>
@@ -164,9 +190,7 @@
 
     <div class="grid-2-1">
 
-      <!-- Missões -->
       <div>
-        <!-- Filtros -->
         <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
           <button class="filter-btn active" onclick="filterMissions('todas', this)">Todas</button>
           <button class="filter-btn" onclick="filterMissions('ativa', this)">⚡ Ativas</button>
@@ -177,14 +201,10 @@
         </div>
 
         <div class="mission-grid" id="missions-grid">
-          <!-- Gerado via JS -->
         </div>
       </div>
 
-      <!-- Painel lateral -->
       <div style="display:flex;flex-direction:column;gap:16px">
-
-        <!-- Mini ranking -->
         <div class="card">
           <div class="card-header">
             <div class="card-title">🏆 Ranking de Pontos</div>
@@ -202,6 +222,7 @@
               </div>
               <span class="pts-badge">320 pts</span>
             </div>
+            
             <div class="leaderboard-row">
               <div class="rank-num silver">2</div>
               <div class="user-avatar" style="width:32px;height:32px;border-radius:50%;background:var(--secondary);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff">AP</div>
@@ -213,6 +234,7 @@
               </div>
               <span class="pts-badge" style="background:linear-gradient(135deg,#C0C0C0,#A0A0A0)">280 pts</span>
             </div>
+            
             <div class="leaderboard-row">
               <div class="rank-num bronze">3</div>
               <div class="user-avatar" style="width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff">IP</div>
@@ -227,14 +249,18 @@
             <div class="leaderboard-row">            
           </div>
         </div>
+      </div>
+    </div> </main>
+</div>
 
-<!-- Modal nova missão -->
 <div class="modal-overlay" id="modal-nova-missao">
   <div class="modal" style="width:520px">
+    
     <div class="modal-header">
       <div class="modal-title">⭐ Nova Missão</div>
       <button class="modal-close" onclick="closeModal('modal-nova-missao')">✕</button>
     </div>
+    
     <div class="form-group">
       <label class="form-label">Título da missão *</label>
       <input type="text" class="form-control" id="mis-titulo" placeholder="Ex: Limpar o quintal">
@@ -243,6 +269,7 @@
       <label class="form-label">Descrição</label>
       <textarea class="form-control" id="mis-desc" rows="3" placeholder="Descreva o que precisa ser feito..."></textarea>
     </div>
+    
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Dificuldade</label>
@@ -257,6 +284,7 @@
         <input type="number" class="form-control" id="mis-pts" value="15" min="1" max="100">
       </div>
     </div>
+    
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Ícone</label>
@@ -267,6 +295,7 @@
         <input type="date" class="form-control" id="mis-prazo">
       </div>
     </div>
+    
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-nova-missao')">Cancelar</button>
       <button class="btn btn-primary" onclick="addMission()">Criar Missão</button>
@@ -275,38 +304,53 @@
 </div>
 
 <div id="toast-container" class="toast-container"></div>
+
 <script src="../assets/js/app.js"></script>
 <script src="../assets/js/layout.js"></script>
+
 <script>
+// 1. BANCO DE DADOS SIMULADO 
 let missions = [
   { id:1, titulo:'Organizar a garagem',   desc:'Limpar e organizar todos os itens da garagem',  pts:30, icone:'🏠', dif:'medio',   prazo:'2026-04-30', status:'ativa'    },
   { id:2, titulo:'Semana sem delivery',   desc:'Cozinhar em casa todos os dias por uma semana', pts:50, icone:'🍳', dif:'dificil', prazo:'2026-04-27', status:'ativa'    },
   { id:3, titulo:'Cuidar dos peixes',     desc:' Limpar o aquário e alimentar eles', pts:15, icone:'🐟', dif:'facil',   prazo:'2026-04-26', status:'ativa'    },
 ];
 
-let missionFilter = 'todas';
-let nextMissionId = 7;
+let missionFilter = 'todas'; // Guarda qual filtro (aba) está selecionado
+let nextMissionId = 7;       // Controle de ID para quando criar novas missões
 
+// Dicionários para ajudar a formatar os textos e regras de pontos baseados na dificuldade
 const DIFF_LABELS = { facil:'Fácil', medio:'Médio', dificil:'Difícil' };
 const PTS_RANGE   = { facil:[10,20], medio:[25,40], dificil:[45,60] };
 
+// 2. FUNÇÃO PRINCIPAL DE RENDERIZAÇÃO
 function renderMissions() {
-  let filtered = missions;
+  let filtered = missions; // Cria uma cópia da lista
+  
+  // Aplica as regras de filtro dependendo do botão clicado
   if (missionFilter === 'ativa' || missionFilter === 'concluida') {
-    filtered = missions.filter(m => m.status === missionFilter);
+    filtered = missions.filter(m => m.status === missionFilter); // Filtra por Status
   } else if (['facil','medio','dificil'].includes(missionFilter)) {
-    filtered = missions.filter(m => m.dif === missionFilter);
+    filtered = missions.filter(m => m.dif === missionFilter); // Filtra por Dificuldade
   }
 
+  // Se não houver missões com esse filtro, mostra mensagem de "vazio"
   if (!filtered.length) {
     document.getElementById('missions-grid').innerHTML =
       '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">⭐</div><p>Nenhuma missão encontrada.</p></div>';
     return;
   }
 
+  // Transforma cada objeto do array "filtered" em um bloco de código HTML
   document.getElementById('missions-grid').innerHTML = filtered.map(m => {
+    
+    // Verifica se a missão já está concluída para adicionar a classe visual ".done"
     const isDone = m.status === 'concluida';
+    
+    // Formata a data (se existir) para o padrão brasileiro DD/MM/AAAA
     const prazoStr = m.prazo ? `📅 Prazo: ${new Date(m.prazo+'T00:00:00').toLocaleDateString('pt-BR')}` : '📅 Sem prazo';
+    
+    // Retorna o HTML injetando as variáveis
     return `<div class="mission-full-card${isDone?' done':''}">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px">
         <div style="font-size:2rem;line-height:1">${m.icone}</div>
@@ -322,59 +366,93 @@ function renderMissions() {
       <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:12px">${prazoStr}</div>
       <div style="display:flex;gap:8px">
         ${!isDone ? `<button class="btn btn-success btn-sm w-full" onclick="completeMission(${m.id})">✅ Concluir</button>` : ''}
+        
         <button class="btn btn-danger btn-sm btn-icon" onclick="deleteMission(${m.id})" title="Excluir">🗑️</button>
       </div>
     </div>`;
-  }).join('');
+  }).join(''); // Junta todos os HTMLs gerados em um só texto.
 }
 
+// 3. AÇÕES DAS MISSÕES
+
+// Marca uma missão como concluída
 function completeMission(id) {
+  // Procura no array qual é a missão que tem esse ID
   const m = missions.find(m => m.id === id);
-  if (!m) return;
-  m.status = 'concluida';
+  if (!m) return; // Segurança: se não achar, para aqui.
+  
+  m.status = 'concluida'; // Altera o status no banco de dados
+  
+  // Chama o balãozinho de notificação flutuante na tela
   showToast(`Missão "${m.titulo}" concluída! +${m.pts} pts 🎉`, 'success');
+  
+  // Manda desenhar a lista de novo para atualizar a tela
   renderMissions();
 }
 
+// Exclui uma missão
 function deleteMission(id) {
+  // Substitui a lista de missões por ela mesma, excluindo apenas o item que tem esse ID
   missions = missions.filter(m => m.id !== id);
   showToast('Missão excluída.', 'danger');
-  renderMissions();
+  renderMissions(); // Atualiza a tela
 }
 
+// Criar uma nova missão a partir do Modal (Formulário)
 function addMission() {
+  // Pega o valor do campo título e remove espaços extras
   const titulo = document.getElementById('mis-titulo').value.trim();
+  
+  // Validação: Não permite criar se não tiver título
   if (!titulo) { showToast('Informe o título da missão.', 'warning'); return; }
+  
+  // Cria o novo objeto e empurra (.push) para o Array de missões
   missions.push({
-    id: nextMissionId++,
-    titulo,
+    id: nextMissionId++, // Usa o ID atual e já soma +1 para a próxima
+    titulo, // Atalho do JS (igual a titulo: titulo)
     desc:  document.getElementById('mis-desc').value.trim(),
     pts:   parseInt(document.getElementById('mis-pts').value) || 15,
     icone: document.getElementById('mis-icone').value || '⭐',
     dif:   document.getElementById('mis-dif').value,
     prazo: document.getElementById('mis-prazo').value || null,
-    status: 'ativa'
+    status: 'ativa' // Toda missão nova nasce ativa
   });
+  
+  // Fecha a janela flutuante
   closeModal('modal-nova-missao');
+  
+  // Limpa os inputs principais para o próximo uso
   document.getElementById('mis-titulo').value = '';
   document.getElementById('mis-desc').value   = '';
+  
   showToast('Missão criada!', 'success');
-  renderMissions();
+  renderMissions(); // Atualiza a tela incluindo a missão nova
 }
 
+// 4. FUNÇÕES AUXILIARES
+
+// Filtra a lista ao clicar nos botões (Todas, Ativas, etc)
 function filterMissions(filter, btn) {
-  missionFilter = filter;
+  missionFilter = filter; // Atualiza a variável global
+  
+  // Remove a classe 'active' (escura) de todos os botões de filtro
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  // Coloca a classe 'active' apenas no botão que foi clicado
   btn.classList.add('active');
-  renderMissions();
+  
+  renderMissions(); // Manda desenhar a tela filtrada
 }
 
+// Atualiza o valor sugerido de pontos no modal quando você troca a dificuldade
 function updatePts() {
-  const dif = document.getElementById('mis-dif').value;
-  const [min, max] = PTS_RANGE[dif];
+  const dif = document.getElementById('mis-dif').value; // Ex: 'medio'
+  const [min, max] = PTS_RANGE[dif]; // Pega o [25, 40] do dicionário
+  
+  // Calcula a média e insere no campo de pontos. (Ex: Medio = 33)
   document.getElementById('mis-pts').value = Math.round((min + max) / 2);
 }
 
+// Executa a primeira renderização assim que o HTML termina de carregar
 document.addEventListener('DOMContentLoaded', renderMissions);
 </script>
 </body>
